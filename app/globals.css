@@ -1,8 +1,20 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Nord";
+  src: url("/fonts/Nord-Regular.otf") format("opentype");
+}
+@font-face {
+  font-family: "HvDTrial Brandon Grotesque";
+  src: url("/fonts/HvDTrial_Brandon_Grotesque_medium.otf")
+}
+@font-face {
+  font-family: "HvDTrial Brandon Grotesque Bold";
+  src: url("/fonts/HvDTrial_Brandon_Grotesque_bold.otf")
+}
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: ##fff;
+  --foreground: #000;
 }
 
 @theme inline {
@@ -14,13 +26,112 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #fff;
+    --foreground: #000;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "HvDTrial Brandon Grotesque", "Nord", sans-serif;
+}
+
+
+h1 {
+  font-family: "Nord";       /* Uses Nord font for brand identity */
+  font-weight: 400;          /* Regular weight */
+  font-size: 2rem;           /* 32px font size */
+}
+h2 {
+  font-family: "Nord";
+  font-weight: 400;
+  font-size: 1.5rem;         /* 24px font size */
+}
+
+h3 {
+  font-family: "Nord";
+  font-weight: 400;
+  font-size: 1.1rem;         /* Approximately 17.6px */
+}
+h4 {
+  font-family: "HvDTrial Brandon Grotesque";
+  font-weight: 400;
+  font-size: 1.1rem;         /* Approximately 17.6px */
+  line-height: 1.5rem;       /* Improves readability */
+}
+h5 {
+  font-family: "HvDTrial Brandon Grotesque Bold";
+  font-weight: 600;          /* Semi-bold */
+  font-size: 1.1rem;
+  line-height: 1.5rem;
+}
+p {
+  font-family: "HvDTrial Brandon Grotesque" ;
+  font-size: 1.1rem;           /* 16px */
+  font-weight: 400;
+  line-height: 1.5rem;
+}
+.calender-text {
+  font-family: "HvDTrial Brandon Grotesque" ;
+  font-size: 1.1rem;           /* 16px */
+  font-weight: 400;
+  line-height: 1.5rem;
+  
+}
+/* styles.css */
+/* Remove the background color of the calendar */
+.react-datepicker__month {
+  background-color: transparent !important;  /* Override default background */
+  
+}
+
+/* Set the calendar background to transparent */
+.react-datepicker__calendar {
+  background-color: transparent !important;  /* Override default background */
+  
+}
+.no-shadow {
+  box-shadow: none !important;
+}
+
+/* Weekday names */
+.react-datepicker__day-name {
+  font-family: "HvDTrial Brandon Grotesque" ;
+  font-size: 1.1rem;           /* 16px */
+  font-weight: 400;
+  
+  line-height: 1.5rem;
+}
+
+/* Day cells */
+.calendar-day {
+  font-family: "HvDTrial Brandon Grotesque" ;
+  font-size: 1.1rem;           /* 16px */
+  font-weight: 400;
+  line-height: 1.5rem;
+  /* width: 2.5rem;
+  height: 2.5rem; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+
+}
+
+/* Optional: Remove the gray background from the selected date */
+.react-datepicker__day--selected {
+  background-color: #000000 !important}  /* Change to your preferred color
+
+
+
+/* .react-datepicker__day--today {
+  background-color: #000000 !important; 
+  opacity: 0.1;
+} */
+
+.react-datepicker__day--today {
+  
+  background-color: transparent !important; /* Make today NOT colored */
+  color: inherit !important; 
 }
