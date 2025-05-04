@@ -13,7 +13,7 @@
   src: url("/fonts/HvDTrial_Brandon_Grotesque_bold.otf")
 }
 :root {
-  --background: ##fff;
+  --background: #fff;
   --foreground: #000;
 }
 
@@ -134,4 +134,20 @@ p {
   
   background-color: transparent !important; /* Make today NOT colored */
   color: inherit !important; 
+}
+
+/* .dynamic-padding {
+  padding-left: clamp(20px, 7.5vw, 236px);
+  padding-right: clamp(20px, 7.5vw, 236px);
+} */
+.dynamic-x-padding {
+  padding-left: clamp(20px, 16.39vw, 236px);
+  padding-right: clamp(20px, 16.39vw, 236px);
+}
+
+@media (max-width: 1024px) {
+  .dynamic-x-padding {
+    padding-left: clamp(20px, 7.5vw, 236px);
+    padding-right: clamp(20px, 7.5vw, 236px);
+  }
 }

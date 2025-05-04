@@ -46,14 +46,23 @@ const ChangePickupTime = ({ modal, setModal, setPickupDetails }: ChangePickupTim
   const handleSubmit = () => {
     setLoading(true);
 
+    let hasError = false;
+
     if (!formData.date) {
       setError((prev) => ({ ...prev, date: "Must select a pickup date" }));
-      setLoading(false);
-      return;
+      hasError = true;
+    } else {
+      setError((prev) => ({ ...prev, date: "" }));
     }
 
     if (!formData.location) {
       setError((prev) => ({ ...prev, location: "Must select a pickup location" }));
+      hasError = true;
+    } else {
+      setError((prev) => ({ ...prev, location: "" }));
+    }
+
+    if (hasError) {
       setLoading(false);
       return;
     }

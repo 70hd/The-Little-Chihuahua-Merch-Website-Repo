@@ -6,19 +6,36 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    if (!body.name || !body.email || !body.phoneNumber || !body.selectLocation || !body.comments) {
-      return new Response(JSON.stringify({ error: "All fields are required" }), { status: 400 });
+    if (!body.name || !body.email || !body.comments) {
+      return new Response(JSON.stringify({ error: "Name, email, and comments are required." }), { status: 400 });
     }
 
     const updateForm = await prisma.contact.create({
       data: {
         name: body.name,
         email: body.email,
-        phoneNumber: body.phoneNumber,
-        selectLocation: body.selectLocation,
+        phoneNumber: body.phoneNumber || null,  // Optional, null if not provided
+        selectLocation: body.selectLocation || null,
         comments: body.comments,
       },
     });
+    const zapRes = await fetch("https://hooks.zapier.com/hooks/catch/22705783/2p59rpf/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: body.name,
+        email: body.email,
+        phoneNumber: body.phoneNumber,
+        selectLocation: body.selectLocation,
+        comments: body.comments,
+      }),
+    });
+    
+    console.log("Zapier response:", await zapRes.text());
+    
+    if (!zapRes.ok) {
+      console.error("Zapier request failed:", zapRes.status);
+    }
 
     return new Response(JSON.stringify(updateForm), { status: 200 });
   } catch (error) {

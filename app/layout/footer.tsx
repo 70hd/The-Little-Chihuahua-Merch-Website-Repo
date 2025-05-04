@@ -34,14 +34,14 @@ const Footer = () => {
 
   return (
     <footer className="w-full flex flex-col">
-      <div className="w-full h-fit flex flex-col gap-[24px] px-[236px] py-9 bg-[#16767E] items-center justify-center text-white">
+      <div className="w-full h-fit flex flex-col gap-[24px] dynamic-x-padding py-9 bg-[#16767E] items-center justify-center text-white">
         <div className="w-fit h-fit flex flex-col text-center">
           <h5>The Little Chihuahua</h5>
           <p>Three San Francisco locations to serve you
           </p>
         </div>
         <Button primary={true} link="" isFooter={true}>ORDER ONLINE</Button>
-        <div className="w-full flex gap-[30px] items-start justify-center">
+        <div className="w-full flex md:flex-row flex-col gap-[30px] items-start justify-center">
           {locations.map((info, i) => (
             <address className="w-full not-italic text-center h-fit flex flex-col px-[15px] pb-6" key={i}>
               <h2 className="pt-4 pb-1">{info.name}</h2>

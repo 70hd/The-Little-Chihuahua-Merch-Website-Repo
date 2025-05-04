@@ -5,7 +5,7 @@ import React from "react";
 
 const Navbar = () => {
   return (
-      <nav className="sticky w-full z-50 h-[83px px-[236px]" aria-label="Main Navigation">
+      <nav className="sticky w-full z-40 h-[83px] dynamic-x-padding" aria-label="Main Navigation">
         <div className="w-full  flex justify-between px-1 pt-[0.7rem] pb-[0.55rem]">
           <Link href={"/"}>
           <Image
@@ -16,13 +16,13 @@ const Navbar = () => {
           />
           </Link>
           <div className="flex gap-6">
-          <Link href={"/"}>
+          <Link href={"/contact"}>
           <h3 className="text-[#CD3626]">
             Contact
           </h3>
           </Link>
           
-          <Button primary={true} link="/checkout">ORDER ONLINE</Button>
+          <Button primary={true} link="/checkout">CHECKOUT</Button>
           </div>
         </div>
       </nav>

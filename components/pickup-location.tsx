@@ -14,8 +14,8 @@ const PickupLocation = () => {
   };
 
   return (
-    <div className="relative w-fit h-fit flex gap-6">
-      <div className="flex flex-col pl-[236px]">
+    <div className="relative w-fit h-fit flex gap-6 ">
+      <div className="flex flex-col">
         <p>Pickup from {location}</p>
         <p>{time}</p>
       </div>

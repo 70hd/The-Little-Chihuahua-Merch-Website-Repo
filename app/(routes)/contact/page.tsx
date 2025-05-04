@@ -37,20 +37,20 @@ const Contact = () => {
 
   const handleSubmit = async () => {
     setLoading(true);
-    // const newErrors: Record<string, string> = {};
+    const newErrors: Record<string, string> = {};
 
-    // fields.forEach(({ name, value, required }) => {
-    //   const val = value.trim();
-    //   if (required && !val) newErrors[name] = "This field is required.";
-    //   if (name === "email" && val && !/^\S+@\S+\.\S+$/.test(val))
-    //     newErrors[name] = "Please enter a valid email address.";
-    //   if (name === "phoneNumber" && val && !/^\+?[0-9]{7,15}$/.test(val))
-    //     newErrors[name] = "Please enter a valid phone number.";
-    // });
+    fields.forEach(({ name, value, required }) => {
+      const val = value.trim();
+      if (required && !val) newErrors[name] = "This field is required.";
+      if (name === "email" && val && !/^\S+@\S+\.\S+$/.test(val))
+        newErrors[name] = "Please enter a valid email address.";
+      if (name === "phoneNumber" && val && !/^\+?[0-9]{7,15}$/.test(val))
+        newErrors[name] = "Please enter a valid phone number.";
+    });
 
-    // setErrors(newErrors);
+    setErrors(newErrors);
 
-    // if (Object.keys(newErrors).length) return;
+    if (Object.keys(newErrors).length) return;
 
     try {
       console.log(
@@ -59,8 +59,9 @@ const Contact = () => {
         )
       );
       const formData = Object.fromEntries(
-        fields.map(({ name, value }) => [name, value])
+        fields.map(({ name, value }) => [name, value.trim() === "" ? null : value])
       );
+
       const res = await fetch("/api/contact-form", {
         method: "POST",
         headers: {
@@ -85,7 +86,7 @@ const Contact = () => {
 
   if (submitted) {
     return (
-      <div className="px-[236px] pt-[12px] pb-42 w-full flex flex-col gap-6">
+      <div className="dynamic-x-padding pt-[12px] pb-42 w-full flex flex-col gap-6 my-24">
         <header>
           <h1 className="text-[#16767E] mb-[1.5rem]" tabIndex={0}>
             Thank You
@@ -106,7 +107,7 @@ const Contact = () => {
   }
 
   return (
-    <div className="px-[236px] my-12">
+    <div className="dynamic-x-padding my-24">
       <div className="w-full flex flex-col gap-6">
         <h1 className="text-[#16767E]">Contact</h1>
         <h5>
@@ -123,25 +124,26 @@ const Contact = () => {
             const isTextarea = field.name.toLowerCase().includes("comment");
 
             return (
-              <div key={index} className="relative flex flex-col gap-3">
-                <label htmlFor={id} className="sr-only">
+              <div key={index} className="flex flex-col gap-3">
+                <label htmlFor={id} className="text-[1rem] text-black/75 font-medium">
                   {formatLabel(field.name)}
+                  {field.required && <span className="text-[#CD3626]"> *</span>}
                 </label>
                 {field.options ? (
-                  <>
+                  <div className="relative w-full max-w-[606px]">
                     <Image
                       src="/icons/right-arrow.svg"
-                      width={16}
-                      height={16}
+                      width={20}
+                      height={20}
                       alt="Dropdown arrow"
-                      className="pointer-events-none absolute top-1/2 right-96 transform -translate-y-1/2"
+                      className="pointer-events-none absolute top-1/2 right-3 transform -translate-y-1/2"
                     />
                     <select
                       id={id}
                       name={field.name}
                       value={field.value}
                       onChange={(e) => handleChange(e, index)}
-                      className={`border-[.5px] text-[1.1rem] border-black/75 p-3 pr-10 rounded w-[606px] appearance-none focus:outline-none focus:ring-0 ${
+                      className={`border-[.5px] text-[1.1rem] border-black/75 p-3 pr-10 rounded w-full max-w-[606px] appearance-none focus:outline-none focus:ring-0 ${
                         !field.value ? "text-black/40" : "text-black"
                       }`}
                     >
@@ -152,7 +154,7 @@ const Contact = () => {
                         </option>
                       ))}
                     </select>
-                  </>
+                  </div>
                 ) : isTextarea ? (
                   <textarea
                     id={id}

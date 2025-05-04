@@ -2,7 +2,7 @@ import React from 'react';
 
 const NotFound = () => {
   return (
-    <main role="main" className="flex flex-col gap-[30px] px-[236px] pt-[12px] pb-42">
+    <main role="main" className="flex flex-col gap-[30px] dynamic-x-padding my-24">
       <header>
         <h1 className="text-[#16767E]" tabIndex={0}>
           Oops! That Page Can’t Be Found.

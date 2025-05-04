@@ -21,7 +21,7 @@ const PaymentDetails = () => {
   };
 
   return (
-    <section className="relative w-[606px] p-12 flex flex-col gap-8">
+    <section className="relative lg:w-fit w-full p-6 flex flex-col gap-[30px]">
       <h2>How to get it</h2>
 
       {isModalOpen && (
