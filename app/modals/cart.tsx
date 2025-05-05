@@ -1,4 +1,5 @@
 "use client";
+import Button from '@/components/button';
 import CartDisplay from '@/components/cart-display';
 import { useCart } from '@/context/cart-context';
 import React, { useEffect } from 'react';
@@ -39,9 +40,10 @@ const Cart = ({ canScroll, modal, setModal, value }: CartProps) => {
       aria-modal="true"
       aria-label="Shopping cart"
       tabIndex={-1}
-      className={`fixed top-0 h-screen w-full md:w-[654px] z-50 border border-black/25 bg-white custom-2 p-12 pt-14 transition-transform duration-500 overflow-y-auto flex flex-col ${position} transform ${translate}`}
+      className={`fixed top-0 h-screen w-full md:w-[654px] z-50 border border-black/25 bg-white custom-2 px-12 transition-transform duration-500 overflow-y-auto flex flex-col ${position} transform ${translate}`}
     >
       <CartDisplay button={true} checkout={false}/>
+
     </section>
   );
 };

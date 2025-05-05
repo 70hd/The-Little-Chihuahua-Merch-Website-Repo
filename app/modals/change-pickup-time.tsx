@@ -68,9 +68,7 @@ const ChangePickupTime = ({ modal, setModal, setPickupDetails }: ChangePickupTim
     }
 
     const date = new Date(formData.date);
-    const matchingHours = options[0].options.find((opt) => opt.location === formData.location)?.hours || "";
-
-    // Format date to show more human-friendly format
+    const matchingHours = options[0]?.options?.find((opt) => opt.location === formData.location)?.hours || "";
     const formattedDate = formatDate(date);
 
     setPickupDetails(`${formData.location} ${matchingHours}`, formattedDate);
@@ -83,7 +81,7 @@ const ChangePickupTime = ({ modal, setModal, setPickupDetails }: ChangePickupTim
     const diffTime = date.getTime() - now.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 3600 * 24)); // Difference in days
 
-    const options = { weekday: "long", month: "long", day: "numeric", year: "numeric" };
+    const options: Intl.DateTimeFormatOptions = { weekday: "long", month: "long", day: "numeric", year: "numeric" };
 
     if (diffDays === 0) {
       return `Today, ${date.toLocaleDateString("en-US", options)}`;

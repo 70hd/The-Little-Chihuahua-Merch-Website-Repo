@@ -7,10 +7,11 @@ type Product = {
   title: string;
   image: string;
   imageAlt: string;
-  price: object;
+  price: number;
   quantity: number;
   size: string;
   color: string;
+  alt: string,
 };
 
 type CartProductCardProps = {
@@ -64,7 +65,7 @@ const CartProductCard = ({ product, onRemove,onUpdateQuantity }: CartProductCard
           </button>
         </div>
         <div className="w-full h-fit flex flex-col gap-[6px]">
-          <h5>${product.price}.00</h5>
+       <h5>${product.price}</h5>
           <Quantity number={quantity} setNumber={setQuantity} />
         </div>
       </div>

@@ -84,20 +84,22 @@ type ProductProps = {
 
 const Product = ({ image, size, title, price, status, alt }: ProductProps) => {
   const [hover, setHover] = useState(false);
+  const [cartModal, setCartModal] = useState(false);
 
   const formattedStatus = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase().replace("_", " ");
 
   return (
     <article
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
+    
       aria-label={`Product: ${title}`}
       className="relative"
     >
       <div className="w-full flex flex-col gap-3">
 
-        <div className="relative w-full">
-          <Link href={`/product/${title}`}>
+        <div className="relative w-full"  onMouseEnter={() => !cartModal && setHover(true)}
+      onMouseLeave={() => setHover(false)}>
+          <Link href={`/product/${title}`}   
+         >
             <Image
               src={image}
               width={285}
@@ -113,7 +115,7 @@ const Product = ({ image, size, title, price, status, alt }: ProductProps) => {
             className="absolute top-0 left-0 w-full h-full pointer-events-none"
           >
             <div className="pointer-events-auto">
-              <QuickAdd hover={hover} size={size} />
+              <QuickAdd setCartModal={setCartModal} cartModal={cartModal} hover={hover} size={size} setHover={setHover}/>
             </div>
           </div>
         </div>

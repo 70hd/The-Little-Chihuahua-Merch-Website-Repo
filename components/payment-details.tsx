@@ -6,14 +6,21 @@ import Image from "next/image";
 import Button from "./button";
 import ChangePickupTimeModal from "@/app/modals/change-pickup-time";
 
-const PaymentDetails = () => {
+
+type PriceState = {
+  subtotal: number;
+  estimatedTaxes: number;
+  estimatedOrderTotal: number;
+};
+
+const PaymentDetails = ({ subtotal, estimatedTaxes, estimatedOrderTotal }: PriceState) => {
   const { location, time, setPickupDetails } = useContext(PickupContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const pricingDetails = [
-    { title: "Subtotal", amount: 35 },
-    { title: "Estimated Taxes", amount: 35 },
-    { title: "Estimated Order Total", amount: 35 },
+    { title: "Subtotal", amount: subtotal },
+    { title: "Estimated Taxes", amount: estimatedTaxes },
+    { title: "Estimated Order Total", amount: estimatedOrderTotal },
   ];
 
   const handleToggleModal = () => {

@@ -1,84 +1,112 @@
 "use client";
+
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import useCurrentUrl from "@/hooks/use-current-url";
 import { useGetProducts } from "@/hooks/use-get-products";
 import { formatPrice } from "../../../../utils/format-price";
-import React, { useEffect, useState } from "react";
-import Image from "next/image";
 import Quantity from "@/components/quantity";
 import Button from "@/components/button";
 import ProductImages from "@/components/product-images";
 import { useCart } from "@/context/cart-context";
 import Cart from "@/app/modals/cart";
 
-const Product = () => {
-  
+// Define the types for PriceOption, SizeOption, and Product
+interface PriceOption {
+  price: number;
+}
+
+interface SizeOption {
+  id: number;
+  size: string;
+}
+
+interface Product {
+  id: number | number;
+  title: string;
+  description: string;
+  colorName: string;
+  colorHex: string;
+  priceOptions: PriceOption[];
+  sizeOptions: SizeOption[];
+}
+
+const ProductPage = () => {
   const url = useCurrentUrl()?.replace("/product/", "");
   const [product, setProduct] = useState<Product | null>(null);
-  const [color, setColor] = useState({ colorName: "", colorHex: "" });
+  const [color, setColor] = useState<{ colorName: string; colorHex: string }>({
+    colorName: "",
+    colorHex: "",
+  });
   const [loading, products, error] = useGetProducts();
   const [quantity, setQuantity] = useState(1);
-  const [size, setSize] = useState({ id: 0, value: "Select Size" });
-  const { cartItems, addToCart } = useCart();
+  const [size, setSize] = useState<SizeOption>({ id: 0, size: "Select Size" });
+  const { addToCart } = useCart();
   const [sizeError, setSizeError] = useState(false);
-  const [price, setPrice] = useState(0);
+  const [price, setPrice] = useState<PriceOption | number>(0);
   const [modal, setModal] = useState(false);
 
+  // Set product on URL change
   useEffect(() => {
-    if (product?.sizeOptions.length === 1 ) {
-      setSize({ ...size, value: product?.sizeOptions[0].size });
+    const filteredProduct = products?.find((p) => p.title === url);
+    if (filteredProduct) {
+      setProduct({
+        ...filteredProduct,
+        id: Number(filteredProduct.id), // Ensure id is a number
+        sizeOptions: filteredProduct.sizeOptions.map((sizeOption) => ({
+          ...sizeOption,
+          id: sizeOption.id ?? 0, // Ensure id is included
+        })),
+      });
+      setColor({
+        colorName: filteredProduct.colorName,
+        colorHex: filteredProduct.colorHex,
+      });
+      setPrice(filteredProduct.priceOptions[0]);
+    }
+  }, [products, url]);
+
+  // Update price when size changes
+  useEffect(() => {
+    if (product?.sizeOptions?.length === 1) {
+      setSize(product.sizeOptions[0]);
     }
   }, [product]);
 
   useEffect(() => {
+    if (size.size !== "Select Size") {
+      setSizeError(false);
+    }
     if (!product || !product.priceOptions) return;
-    const sizeValue = size?.value?.toLowerCase();
-    if (
-      sizeValue?.startsWith("x") ||
-      sizeValue?.startsWith("5")
-    ) {
-      setPrice(product.priceOptions[1] ?? product.priceOptions[0]);
+    const sizeValue = size.size.toLowerCase();
+    if (sizeValue.startsWith("x") || sizeValue.startsWith("5")) {
+      setPrice(product.priceOptions[1] || product.priceOptions[0]);
     } else {
       setPrice(product.priceOptions[0]);
     }
   }, [product, size]);
 
+  // Handle add to cart
   const toggleSubmit = () => {
-    if (size.value === "") {
+    if (size.size === "Select Size") {
       setSizeError(true);
       return;
-    } else {
-      setModal(true);
-      if (color.colorHex === "" || color.colorName === "") {
-        return;
-      }
+    }
 
+    if (product && color.colorHex && color.colorName) {
       addToCart({
-        id: product.id,
+        id: product.id.toString(),
         title: product.title,
-        price: price,
+        price: typeof price === "number" ? price : price.price,
         color: color.colorName,
-        size: size.value,
+        size: size.size,
         quantity,
-        image: "",
+        image: "", // Placeholder for image
         imageAlt: "",
-        // image: product.image,
-        // imageAlt: product.imageAlt,
       });
+      setModal(true);
     }
   };
-  useEffect(() => {
-    if (products) {
-      const filteredProduct = products.find((product) => product.title === url);
-      if (filteredProduct) {
-        setProduct(filteredProduct);
-        setColor({
-          colorName: filteredProduct.colorName,
-          colorHex: filteredProduct.colorHex,
-        });
-        setPrice(filteredProduct.priceOptions[0]);
-      }
-    }
-  }, [products, url]);
 
   if (loading) return <p className="px-4 py-8">Loading...</p>;
   if (error)
@@ -86,24 +114,28 @@ const Product = () => {
 
   return (
     <div className="flex flex-col lg:flex-row px-4 md:px-16 lg:px-36 xl:px-60 gap-8 py-24 pb-12">
+      {/* Product images */}
       <ProductImages
         imageOptions={[
           { image: "/images/test-image.png", alt: "Product image 1" },
           { image: "/images/logo.svg", alt: "Brand logo" },
         ]}
       />
+
       <div className="w-full h-fit flex flex-col gap-6 py-12">
         <div className="w-full flex flex-col">
           <p>
             {product
-              ? size.value !== "Select Size"
-                ? `$${price.price}`
+              ? size.size !== "Select Size"
+                ? `$${(price as PriceOption).price}`
                 : formatPrice(product)
               : "...Loading Price"}
           </p>
           <h1 className="text-2xl font-semibold">{product?.title}</h1>
         </div>
+
         <p>{product?.description}</p>
+
         <div className="flex flex-col gap-2">
           <p>Color: {color.colorName}</p>
           <div
@@ -117,6 +149,8 @@ const Product = () => {
             />
           </div>
         </div>
+
+        {/* Size selector */}
         <div className="flex flex-col gap-2 relative">
           <label
             htmlFor="size-select"
@@ -124,31 +158,42 @@ const Product = () => {
           >
             {sizeError ? "Please Select A Size" : "Size"}
           </label>
-
           <select
             id="size-select"
             className="border text-[1.1rem] text-black/75 border-black/75 p-3 pr-10 rounded w-full appearance-none focus:outline-none focus:ring-0"
             onChange={(e) => {
-              const selectedValue = e.target.value;
-              setSize({ ...size, value: selectedValue });
+              const selectedSize = product?.sizeOptions.find(
+                (opt) => opt.size === e.target.value
+              );
+              if (selectedSize) setSize(selectedSize);
             }}
             aria-label="Select product size"
           >
-            {product?.sizeOptions.length === 1 ? (
-              <option value={product?.sizeOptions[0].size}>{product?.sizeOptions[0].size}</option>
+            {product?.sizeOptions?.length === 1 ? (
+              <option value={product.sizeOptions[0].size}>
+                {product.sizeOptions[0].size}
+              </option>
             ) : (
               <>
                 <option value="Select Size">Select Size</option>
-                {product?.sizeOptions &&
-                  product.sizeOptions.map((opt) => (
-                    <option key={opt.id} value={opt.size}>
-                      {opt.size}
-                    </option>
-                  ))}
+                {product?.sizeOptions.map((opt) => (
+                  <option
+                    key={opt.id}
+                    value={opt.size}
+                    disabled={opt.status === "OUT_OF_STOCK"}
+                    className={
+                      opt.status === "OUT_OF_STOCK"
+                        ? "opacity-40 cursor-not-allowed"
+                        : ""
+                    }
+                  >
+                    {opt.size}{" "}
+                    {opt.status === "OUT_OF_STOCK" ? "(Out of Stock)" : ""}
+                  </option>
+                ))}
               </>
             )}
           </select>
-
           <Image
             src="/icons/right-arrow.svg"
             width={16}
@@ -158,6 +203,8 @@ const Product = () => {
             className="pointer-events-none absolute top-2/3 right-4 transform -translate-y-1/2"
           />
         </div>
+
+        {/* Quantity and Add to Cart */}
         <div className="flex gap-6 items-center">
           <Quantity setNumber={setQuantity} number={quantity} />
           <Button primary={true} action={toggleSubmit}>
@@ -165,6 +212,8 @@ const Product = () => {
           </Button>
         </div>
       </div>
+
+      {/* Modal */}
       {modal && (
         <div
           className="fixed top-0 left-0 w-full h-screen z-40 bg-black/25"
@@ -176,4 +225,4 @@ const Product = () => {
   );
 };
 
-export default Product;
+export default ProductPage;

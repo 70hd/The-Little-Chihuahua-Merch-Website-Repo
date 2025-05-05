@@ -10,11 +10,12 @@ import { formatPrice } from "@/utils/format-price";
 
 export default function Home() {
   const [finalProducts, setFinalProducts] = useState<ProductType[]>([]);
-  const [loading, products, error] = useGetProducts<ProductType>();
+  const [loading, products, error] = useGetProducts();
 
-  useEffect(() => {
-    setFinalProducts(products);
-  }, [loading, products, error]);
+useEffect(() => {
+  // Ensure products is an array and not null
+  setFinalProducts(products || []);
+}, [loading, products, error]);
 
   return (
     <main className="flex flex-col gap-[30px]">
