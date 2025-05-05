@@ -86,7 +86,7 @@ const Product = ({ image, size, title, price, status, alt }: ProductProps) => {
   const [hover, setHover] = useState(false);
   const [cartModal, setCartModal] = useState(false);
 
-  const formattedStatus = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase().replace("_", " ");
+  const formattedStatus = status.replace(/_/g, " ").toLowerCase().replace(/^./, (c) => c.toUpperCase());
 
   return (
     <article

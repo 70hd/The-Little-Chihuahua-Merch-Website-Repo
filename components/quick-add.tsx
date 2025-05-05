@@ -96,7 +96,7 @@ const QuickAdd = ({
 
   if (hover && allOutOfStock) {
     return (
-      <div className="absolute bg-white text-[#CD3626] px-3  min-h-[53px] items-center flex justify-between bottom-2  left-2 right-2  z-10 cursor-not-allowed">
+      <div className="absolute bg-white text-black/40 px-3  min-h-[53px] items-center flex justify-between bottom-2  left-2 right-2  z-10 cursor-not-allowed">
         <p>Out Of Stock</p>
       </div>
     );
@@ -111,7 +111,7 @@ const QuickAdd = ({
         <div
           className={`${
             !hover && "opacity-0"
-          } bg-white flex flex-wrap gap-[6px] min-h-[53px] px-3  items-center`}
+          } bg-white flex flex-wrap  max-gap-6px min-h-[53px] px-3 items-center`}
         >
           {size.map((item, index) => {
             const product = products?.find((p) => p.id === item.productId);
@@ -144,7 +144,7 @@ const QuickAdd = ({
             !hover && "opacity-0"
           } bg-white px-3 min-h-[53px] items-center flex justify-between`}
         >
-          <p className="text-sm text-black">Quick Add</p>
+          <p className="text-black">Quick Add</p>
           <Image
             src="/icons/plus.svg"
             width={24}

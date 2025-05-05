@@ -1,5 +1,6 @@
 "use client";
 import Button from "@/components/button";
+import Input from "@/components/input";
 import Image from "next/image";
 import React, { useState } from "react";
 
@@ -50,7 +51,10 @@ const Contact = () => {
 
     setErrors(newErrors);
 
-    if (Object.keys(newErrors).length) return;
+    if (Object.keys(newErrors).length) {
+      setLoading(false);
+      return; // Prevents submission if there are errors
+    }
 
     try {
       console.log(
@@ -59,7 +63,10 @@ const Contact = () => {
         )
       );
       const formData = Object.fromEntries(
-        fields.map(({ name, value }) => [name, value.trim() === "" ? null : value])
+        fields.map(({ name, value }) => [
+          name,
+          value.trim() === "" ? null : value,
+        ])
       );
 
       const res = await fetch("/api/contact-form", {
@@ -125,7 +132,10 @@ const Contact = () => {
 
             return (
               <div key={index} className="flex flex-col gap-3">
-                <label htmlFor={id} className="text-[1rem] text-black/75 font-medium">
+                <label
+                  htmlFor={id}
+                  className="text-[1rem] text-black/75 font-medium"
+                >
                   {formatLabel(field.name)}
                   {field.required && <span className="text-[#CD3626]"> *</span>}
                 </label>
@@ -165,14 +175,12 @@ const Contact = () => {
                     className="border-[.5px] text-[1.1rem] text-black/75 border-black/75 p-3 pr-10 rounded appearance-none focus:outline-none focus:ring-0 h-[192px] w-full"
                   />
                 ) : (
-                  <input
+                  <Input
                     id={id}
-                    type="text"
                     name={field.name}
                     value={field.value}
-                    onChange={(e) => handleChange(e, index)}
+                    action={(e) => handleChange(e, index)}
                     placeholder={formatLabel(field.name)}
-                    className="border-[.5px] text-[1.1rem] text-black/75 border-black/75 p-3 pr-10 rounded appearance-none focus:outline-none focus:ring-0 w-[606px]"
                   />
                 )}
                 <ErrorText text={errors[field.name]} />
@@ -181,7 +189,7 @@ const Contact = () => {
           })}
         </div>
         <div>
-          <Button primary={false} action={handleSubmit}>
+          <Button primary={false} action={ handleSubmit}>
             {loading ? "...Submiting" : "Submit"}
           </Button>
         </div>

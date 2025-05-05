@@ -135,7 +135,11 @@ p {
   background-color: transparent !important; /* Make today NOT colored */
   color: inherit !important; 
 }
-
+.max-gap-6px {
+  display: flex;
+  flex-wrap: wrap; /* if you want items to wrap */
+  gap: clamp(1px, 1vw, 5px); /* dynamic gap: 1px to 6px */
+}
 /* .dynamic-padding {
   padding-left: clamp(20px, 7.5vw, 236px);
   padding-right: clamp(20px, 7.5vw, 236px);

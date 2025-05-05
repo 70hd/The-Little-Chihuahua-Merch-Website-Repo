@@ -53,7 +53,7 @@ const CartDisplay: React.FC<CartDisplayProps> = ({ button,setPrice, checkout }) 
   }, [cartItems, setPrice]);
   return (
     <div className="h-fit w-full lg:w-fit flex flex-col gap-9">
-      <header className="w-full bg-white py-3 flex justify-between sticky top-0">
+      <header className="w-full bg-white py-3 flex justify-between sticky border-b border-black/25 top-0">
         <div className="flex flex-col gap-1">
           <a href="/" className="flex items-center gap-1">
             <span className="underline">Continue Shopping</span>
@@ -100,7 +100,7 @@ const CartDisplay: React.FC<CartDisplayProps> = ({ button,setPrice, checkout }) 
       </section>
 
       {button && (
-        <div className="sticky bottom-0 w-full h-fit p-3 bg-white border-t flex justify-between">
+        <div className="sticky bottom-0 w-full h-fit p-3 bg-white border-t border-black/25 flex justify-between">
           <Button link="/checkout" primary={true}>
             Checkout
           </Button>

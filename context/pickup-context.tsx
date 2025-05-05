@@ -5,12 +5,14 @@ import Cookies from "js-cookie";
 interface PickupContextType {
   location: string;
   time: string;
-  setPickupDetails: (location: string, time: string) => void;
+  ship: boolean;
+  setPickupDetails: (location: string, time: string, ship: boolean) => void;
 }
 
 const defaultContext = {
   location: '4123 24th Street',
   time: 'Today: 12:39 PM - 8:00 PM',
+  ship: false,
   setPickupDetails: () => {},
 };
 
@@ -27,8 +29,9 @@ const PickupProvider: React.FC<PickupProviderProps> = ({ children }) => {
   const [pickupContext, setPickupContext] = useState({
     location: '',
     time: '',
+    ship: false,
   });
-
+  
   useEffect(() => {
     // This will run after the first render, only on the client
     setIsMounted(true);
@@ -36,10 +39,12 @@ const PickupProvider: React.FC<PickupProviderProps> = ({ children }) => {
     // Retrieve cookies only on the client
     const locationFromCookie = Cookies.get('location') || '4123 24th Street';
     const timeFromCookie = Cookies.get('time') || 'Today: 12:39 PM - 8:00 PM';
+    const shipFromCookie = Cookies.get('ship') === 'true';
 
     setPickupContext({
       location: locationFromCookie,
       time: timeFromCookie,
+      ship: shipFromCookie,
     });
   }, []);
 
@@ -51,10 +56,13 @@ const PickupProvider: React.FC<PickupProviderProps> = ({ children }) => {
     if (pickupContext.time) {
       Cookies.set('time', pickupContext.time, { expires: 7 });
     }
+    if (pickupContext.ship !== undefined) {
+      Cookies.set('ship', String(pickupContext.ship), { expires: 7 });
+    }
   }, [pickupContext]);
 
-  const setPickupDetails = (location: string, time: string) => {
-    setPickupContext({ location, time });
+  const setPickupDetails = (location: string, time: string, ship: boolean) => {
+    setPickupContext({ location, time, ship });
   };
 
   // If not mounted yet, return null to prevent hydration mismatch

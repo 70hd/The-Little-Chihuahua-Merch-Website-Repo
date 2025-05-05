@@ -20,7 +20,7 @@ const PickupLocation = () => {
         <p>{time}</p>
       </div>
       <Button primary={false} action={toggleModal}>
-        Change Time
+        Change Pickup Date
       </Button>
      {/* {modal && <div className="absolute w-screen h-screen  cursor-pointer z-10" onClick={toggleModal}/>} */}
      {modal && <div

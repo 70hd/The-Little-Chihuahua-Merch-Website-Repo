@@ -6,7 +6,7 @@ import React, { useState } from "react";
 type ChangePickupTimeProps = {
   modal: boolean;
   setModal: React.Dispatch<React.SetStateAction<boolean>>;
-  setPickupDetails: (location: string, time: string) => void;
+  setPickupDetails: (location: string, time: string, ship: boolean) => void;
 };
 
 const ChangePickupTime = ({ modal, setModal, setPickupDetails }: ChangePickupTimeProps) => {
@@ -71,7 +71,7 @@ const ChangePickupTime = ({ modal, setModal, setPickupDetails }: ChangePickupTim
     const matchingHours = options[0]?.options?.find((opt) => opt.location === formData.location)?.hours || "";
     const formattedDate = formatDate(date);
 
-    setPickupDetails(`${formData.location} ${matchingHours}`, formattedDate);
+    setPickupDetails(`${formData.location} ${matchingHours}`, formattedDate,false);
     setLoading(false);
     setModal(false);
   };
