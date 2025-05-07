@@ -47,7 +47,7 @@ model Product {
   images       Image[]
   priceOptions Prices[]
   sizeOptions  Size[]
-  restockNotification RestockNotification? @relation("ProductToRestock")
+  restockNotification RestockNotification[]
 }
 
 model Contact {
@@ -65,9 +65,18 @@ enum STATUS {
   OUT_OF_STOCK
 }
 
-model RestockNotification {
+// model RestockNotification {
+//   id        Int     @id @default(autoincrement())
+//   email     String
+//   productId Int     @unique
+//   product   Product @relation("ProductToRestock", fields: [productId], references: [id])
+// }
+
+model RestockNotification{
   id        Int     @id @default(autoincrement())
   email     String
-  productId Int     @unique
-  product   Product @relation("ProductToRestock", fields: [productId], references: [id])
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+  
+  @@index([productId])
 }

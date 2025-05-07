@@ -12,6 +12,7 @@ import { useCart } from "@/context/cart-context";
 import Cart from "@/app/modals/cart";
 import Input from "@/components/input";
 
+
 // Define the types for PriceOption, SizeOption, and Product
 interface PriceOption {
   price: number;
@@ -20,12 +21,12 @@ interface PriceOption {
 interface SizeOption {
   id: number;
   size: string;
+  status?: string;
 }
 interface Errors {
   email: string;
   size: string;
 }
-
 
 interface Product {
   id: number | number;
@@ -36,6 +37,7 @@ interface Product {
   priceOptions: PriceOption[];
   sizeOptions: SizeOption[];
   status: string;
+  images: { image: string; alt: string; id: number }[];
 }
 
 const ProductPage = () => {
@@ -52,22 +54,44 @@ const ProductPage = () => {
   const [sizeError, setSizeError] = useState(false);
   const [price, setPrice] = useState<PriceOption | number>(0);
   const [modal, setModal] = useState(false);
-  const [notifyMe, setNotifyMe] = useState<string>(""); // instead of useState()
-  const [errors,setErrors] = useState<Errors>({email: "", size:""})
+  const [restockNotification, setRestockNotification] = useState<string>(""); // instead of useState()
+  const [errors, setErrors] = useState<Errors>({ email: "", size: "" });
+  const [restockLoading, setRestockLoading] = useState(false)
+  const ToggleRestockNotification = async () => {
+    setRestockLoading(true);
 
-  const NotifyMe = () => {
-    if (!/^\S+@\S+\.\S+$/.test(notifyMe)) {
-      setErrors((prev) => ({ ...prev, email: "Invalid Email" }));
-   
-    } else {
-     
-      setErrors((prev) => ({ ...prev, email: "" }));
-      console.log(errors)
+    const isValidEmail = /^\S+@\S+\.\S+$/.test(restockNotification);
+    if (!isValidEmail) {
+      setErrors((prev) => ({ ...prev, email: "Invalid email address" }));
+      setRestockLoading(false);
+      return;
+    }
 
+    setErrors((prev) => ({ ...prev, email: "" }));
+    try {
+      const res = await fetch("/api/restock-notification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: restockNotification, id: product?.id }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.message || "Something went wrong");
+      }
+
+    } catch (err: any) {
+      setErrors((prev) => ({ ...prev, email: err.message }));
+    } finally {
+      setRestockNotification("")
+      setRestockLoading(false);
     }
   };
-  const HandleNotifyMeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNotifyMe(e.target.value);
+
+  const HandleRestockNotificationChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRestockNotification(e.target.value);
   };
 
   // Set product on URL change
@@ -81,6 +105,7 @@ const ProductPage = () => {
           ...sizeOption,
           id: sizeOption.id ?? 0, // Ensure id is included
         })),
+        images: filteredProduct.images ?? [],
       });
       setColor({
         colorName: filteredProduct.colorName,
@@ -117,7 +142,7 @@ const ProductPage = () => {
       return;
     }
 
-    if (product && color.colorHex && color.colorName) {
+    if (product && color.colorHex && color.colorName && product.id.toString()) {
       addToCart({
         id: product.id.toString(),
         title: product.title,
@@ -125,26 +150,31 @@ const ProductPage = () => {
         color: color.colorName,
         size: size.size,
         quantity,
-        image: "", // Placeholder for image
+        image: product.images, // Placeholder for image
         imageAlt: "",
       });
       setModal(true);
     }
   };
 
-  if (loading) return <p className="px-4 py-8">Loading...</p>;
+
+
   if (error)
     return <p className="px-4 py-8 text-red-600">Error loading product.</p>;
 
   return (
-    <div className="flex flex-col lg:flex-row px-4 md:px-16 lg:px-36 xl:px-60 gap-8 py-24 pb-12">
+    <div className="flex flex-col lg:flex-row px-4 md:px-16 lg:px-36 xl:px-60 gap-8 py-24 pb-12 items-center">
       {/* Product images */}
-      <ProductImages
-        imageOptions={[
-          { image: "/images/test-image.png", alt: "Product image 1" },
-          { image: "/images/logo.svg", alt: "Brand logo" },
-        ]}
-      />
+      {/* <ProductImages
+        imageOptions={product?.images}
+      /> */}
+<ProductImages
+  imageOptions={product?.images?.map((img,index) => ({
+    id: img.id,  // Ensure the id is being passed, since your `ImageOption` expects it
+    image: img.image,
+    alt: img.alt
+  })) || []}  // Fallback to empty array if `product?.images` is undefined
+/>
 
       <div className="w-full h-fit flex flex-col gap-6 py-12">
         <div className="w-full flex flex-col">
@@ -255,24 +285,29 @@ const ProductPage = () => {
           </div>
         ) : (
           <div className="flex flex-col gap-3">
-          <label htmlFor="email" className={`${errors.email ? "text-[#CD3626]" : ""}`}>{errors.email ? errors.email: "Notify me when it’s back"}</label>
-          <div className="flex gap-3 items-center">
-            <div className="w-full max-w-[248px]">
-              <Input
-                id="email"
-                name="email"
-                value={notifyMe}
-                action={(e) => HandleNotifyMeChange(e)} // use onChange here
-                placeholder="Email"
-              />
+            <label
+              htmlFor="email"
+              className={`${errors.email ? "text-[#CD3626]" : ""}`}
+            >
+              {errors.email ? errors.email : "Notify me when it’s back"}
+            </label>
+            <div className="flex gap-3 items-center">
+              <div className="w-full max-w-[248px]">
+                <Input
+                  id="email"
+                  name="email"
+                  value={restockNotification}
+                  action={(e) => HandleRestockNotificationChange(e)} // use onChange here
+                  placeholder="Email"
+                />
+              </div>
+              <Button primary={false} action={ToggleRestockNotification}>
+                {/* use onClick here */}
+               {restockLoading? "...Loading":"Notify Me"}
+              </Button>
             </div>
-            <Button primary={false} action={NotifyMe}> {/* use onClick here */}
-              Notify Me
-            </Button>
           </div>
-        </div>
         )}
-
       </div>
 
       {/* Modal */}

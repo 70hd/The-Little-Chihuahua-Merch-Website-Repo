@@ -51,9 +51,10 @@ const CartDisplay: React.FC<CartDisplayProps> = ({ button,setPrice, checkout }) 
       estimatedOrderTotal,
     });
   }, [cartItems, setPrice]);
+  console.log(cartItems,"items")
   return (
     <div className="h-fit w-full lg:w-fit flex flex-col gap-9">
-      <header className="w-full bg-white py-3 flex justify-between sticky border-b border-black/25 top-0">
+      <header className="w-full bg-white py-3 flex justify-between sticky z-50 border-b border-black/25 top-0">
         <div className="flex flex-col gap-1">
           <a href="/" className="flex items-center gap-1">
             <span className="underline">Continue Shopping</span>
@@ -78,25 +79,28 @@ const CartDisplay: React.FC<CartDisplayProps> = ({ button,setPrice, checkout }) 
         }`}
         aria-label="Cart items"
       >
-        {cartItems.map((item: CartItem, index: number) => (
+        {cartItems.map((item: CartItem, index: number) => {
+          console.log(cartItems)
+          return (
           <CartProductCard
             key={index}
             product={{
               id: Number(item.id),
               title: item.title,
-              image: "/images/test-image.png",
+              image: item.image,
               alt: "custom alt",
               price: getSafePrice(item.price),
               quantity: item.quantity,
               size: item.size,
               colorName: item.color,
+              color: item.color
             }}
             onUpdateQuantity={(quantity) =>
               updateQuantity(item.size, item.title, quantity)
             }
             onRemove={() => removeFromCart(item.size, item.title)}
           />
-        ))}
+        )})}
       </section>
 
       {button && (

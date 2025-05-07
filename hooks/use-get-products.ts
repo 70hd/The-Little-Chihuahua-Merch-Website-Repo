@@ -11,7 +11,7 @@ type SizeOption = {
 };
 
 type Product = {
-  id: string;
+  id: number;
   title: string;
   description: string;
   colorHex: string;
@@ -33,6 +33,7 @@ export const useGetProducts = (): [boolean, Product[] | null, string | null] => 
         const response = await fetch('/api/get-products');
         const data = await response.json();
         
+        console.log(data)
         if (response.ok) {
           setProducts(data);
         } else {

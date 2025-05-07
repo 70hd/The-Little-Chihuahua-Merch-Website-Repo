@@ -9,6 +9,9 @@ import React, { useEffect, useState } from "react";
 type SizeObject = {
   size: string;
   productId: number;
+  id: number;
+  inventory: number;
+  status: string
 };
 
 type QuickAddProps = {
@@ -57,14 +60,15 @@ const QuickAdd = ({
 
     const selectedPrice = product.priceOptions?.[priceIndex]?.price ?? 0;
 
+
     addToCart({
       id: product.id,
-      title: product.title || "Unknown Product",
+      title: product.title,
       price: selectedPrice,
-      color: product.colorName || "Default Color",
+      color: product.colorName,
       size: selectedSize,
       quantity: 1,
-      image: "", // Optional: fill with product image
+      image: product.images, // Adjust based on actual product property
       imageAlt: "", // Optional: fill with alt text
     });
 

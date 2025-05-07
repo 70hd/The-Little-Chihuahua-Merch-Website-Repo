@@ -20,7 +20,7 @@ useEffect(() => {
   return (
     <main className="flex flex-col gap-[30px]">
       <section
-        className="w-full h-[392px] bg-[url('/images/test-image.png')] bg-no-repeat bg-cover z-0 dynamic-x-padding py-24 flex flex-col relative"
+        className="w-full h-[392px] bg-[url('https://res.cloudinary.com/da8kkevrh/image/upload/w_1000,ar_1:1,c_fill,g_auto,e_art:hokusai/v1746583790/2023_TLC_Product_46-min_n2uyam.jpg')] bg-no-repeat bg-cover z-0 dynamic-x-padding py-24 flex flex-col relative"
         aria-label="Hero banner"
       >
         <h1>
@@ -38,27 +38,29 @@ useEffect(() => {
       >
         <div className="flex flex-wrap gap-3 w-full h-fit justify-between items-center">
           <PickupLocation />
-          <Dropdown setProducts={setFinalProducts} products={products} />
+          <Dropdown setProducts={setFinalProducts} products={products || []} />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {!loading && finalProducts?.length ? (
-            finalProducts.map((product: ProductType) => {
-              return (
-                <Product
-                  key={product.id}
-                  status={product.status}
-                  price={formatPrice(product)}
-                  title={product.title}
-                  image="/images/test-image.png"
-                  alt="custom alt"
-                  size={product.sizeOptions}
-                />
-              );
-            })
-          ) : (
-            <p>{loading ? "Loading..." : "No products available"}</p>
-          )}
+        {
+  loading
+    ? Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="w-full h-[392px] loader" />
+      ))
+    : finalProducts.map((product: ProductType) => (
+        <Product
+          key={product.id}
+          status={product.status}
+          price={formatPrice(product)}
+          title={product.title}
+          image={product.images}
+          alt="custom alt"
+          size={product.sizeOptions}
+          loading={loading}
+        />
+      ))
+}
+            
         </div>
       </section>
      

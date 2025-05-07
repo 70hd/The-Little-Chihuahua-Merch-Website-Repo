@@ -1,15 +1,16 @@
 "use client";
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import Cookies from 'js-cookie';
+import { number } from 'framer-motion';
 
 interface CartItem {
-  id: string;
+  id: string | number;
   title: string;
   price: number;
   color: string;
   size: string;
   quantity: number;
-  image: string;
+  image: { id: number; productId: number; image: string, alt: string }[];
   imageAlt: string;
 }
 
@@ -46,10 +47,12 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   }, [cartItems]);
 
   const addToCart = (item: CartItem) => {
+    console.log(item,"oite")
     setCartItems(prev => {
+  
       const existing = prev.find(p => p.id === item.id && p.size === item.size && p.color === item.color);
       if (existing) {
-        
+    
         return prev.map(p =>{
           console.log(p.quantity + item.quantity)
           return p.id === item.id  ? { ...p, quantity: p.quantity + item.quantity } : p
