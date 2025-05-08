@@ -11,7 +11,7 @@ type SizeObject = {
   productId: number;
   id: number;
   inventory: number;
-  status: string
+  status: string;
 };
 
 type QuickAddProps = {

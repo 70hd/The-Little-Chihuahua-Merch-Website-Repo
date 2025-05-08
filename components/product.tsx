@@ -4,19 +4,26 @@ import React, { useState } from "react";
 import QuickAdd from "./quick-add";
 
 type ProductProps = {
-  image: { id: number; productId: number; image: string, alt: string }[];
+  image: { id: number; productId: number; image: string; alt: string }[];
   title: string;
   alt: string;
   price: string;
   status: string;
   size: string | string[];
-  loading: boolean
+  loading: boolean;
 };
 
-const Product = ({ image,loading, size, title, price, status, alt }: ProductProps) => {
+type SizeObject = {
+  size: string;
+  productId: number;
+  id: number;
+  inventory: number;
+  status: string;
+};
+
+const Product = ({ image, loading, size, title, price, status, alt }: ProductProps) => {
   const [hover, setHover] = useState(false);
   const [cartModal, setCartModal] = useState(false);
-  // console.log(image[0])
 
   const formattedStatus = status
     .replace(/_/g, " ")
@@ -24,9 +31,26 @@ const Product = ({ image,loading, size, title, price, status, alt }: ProductProp
     .replace(/^./, (c) => c.toUpperCase());
   const dynamicImage = hover ? 1 : 0;
 
+  // Normalize sizes - allow dynamic assignment of status/inventory if size is SizeObject[]
+  const normalizedSizes: SizeObject[] = Array.isArray(size)
+    ? typeof size[0] === "object"
+      ? (size as unknown as SizeObject[])
+      : (size as string[]).map((s, i) => ({
+          size: s,
+          productId: image?.[0]?.productId ?? 0,
+          id: i,
+          inventory: 1,
+          status: status,
+        }))
+    : [{
+        size: size as string,
+        productId: image?.[0]?.productId ?? 0,
+        id: 0,
+        inventory: 1,
+        status: status,
+      }];
 
   return (
-    
     <article aria-label={`Product: ${title}`} className="relative">
       <div className="w-full flex flex-col gap-3">
         <div
@@ -36,8 +60,8 @@ const Product = ({ image,loading, size, title, price, status, alt }: ProductProp
         >
           <Link href={`/product/${title}`}>
             <CldImage
-              src={image[dynamicImage].image} // Use this sample image or upload your own via the Media Explorer
-              width="500" // Transform the image: auto-crop to square aspect_ratio
+              src={image[dynamicImage].image}
+              width="500"
               height="500"
               alt={image[dynamicImage]?.alt}
               crop={{
@@ -56,7 +80,7 @@ const Product = ({ image,loading, size, title, price, status, alt }: ProductProp
                 setCartModal={setCartModal}
                 cartModal={cartModal}
                 hover={hover}
-                size={size}
+                size={normalizedSizes}
                 setHover={setHover}
               />
             </div>
