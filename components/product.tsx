@@ -33,22 +33,22 @@ const Product = ({ image, loading, size, title, price, status, alt }: ProductPro
 
   // Normalize sizes - allow dynamic assignment of status/inventory if size is SizeObject[]
   const normalizedSizes: SizeObject[] = Array.isArray(size)
-    ? typeof size[0] === "object"
-      ? (size as unknown as SizeObject[])
-      : (size as string[]).map((s, i) => ({
-          size: s,
-          productId: image?.[0]?.productId ?? 0,
-          id: i,
-          inventory: 1,
-          status: status,
-        }))
-    : [{
-        size: size as string,
+  ? size.length > 0 && typeof size[0] === "object" // Ensure size is a valid array of objects (SizeObject[])
+    ? size as unknown as SizeObject[]  // Safe cast to SizeObject[]
+    : (size as string[]).map((s, i) => ({
+        size: s,
         productId: image?.[0]?.productId ?? 0,
-        id: 0,
+        id: i,
         inventory: 1,
         status: status,
-      }];
+      }))
+  : [{
+      size: typeof size === "string" ? size : "", // Safe fallback if size is a single string
+      productId: image?.[0]?.productId ?? 0,
+      id: 0,
+      inventory: 1,
+      status: status,
+    }];
 
   return (
     <article aria-label={`Product: ${title}`} className="relative">
