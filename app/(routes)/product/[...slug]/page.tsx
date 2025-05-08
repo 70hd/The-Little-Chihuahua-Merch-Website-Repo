@@ -152,7 +152,12 @@ const ProductPage = () => {
         color: color.colorName,
         size: size.size,
         quantity,
-        image: product.images, // Placeholder for image
+        image: product.images?.map((img) => ({
+          id: img.id,
+          productId: product.id,
+          image: img.image,
+          alt: img.alt,
+        })) ?? [],
         imageAlt: "",
       });
       setModal(true);

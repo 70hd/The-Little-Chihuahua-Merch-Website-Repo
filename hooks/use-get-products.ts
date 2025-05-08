@@ -11,6 +11,7 @@ type SizeOption = {
 };
 
 type Product = {
+  images: never[];
   id: number;
   title: string;
   description: string;
