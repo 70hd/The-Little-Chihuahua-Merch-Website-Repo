@@ -1,82 +1,60 @@
 generator client {
   provider = "prisma-client-js"
 }
+
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model Size {
-  id        Int     @id @unique @default(autoincrement())
-  size      String
-  productId Int
-  inventory Int
-  status    STATUS?
-  product   Product @relation(fields: [productId], references: [id])
+  id        BigInt?
+  size      String? @db.VarChar(512)
+  productid BigInt?
+  inventory BigInt?
+  status    String? @db.VarChar(512)
 
-  @@index([productId], map: "Size_productId_fkey")
+  @@ignore
 }
 
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model Image {
-  id        Int     @id @unique @default(autoincrement())
-  image     String
-  productId Int
-  alt       String
-  product   Product @relation(fields: [productId], references: [id])
+  id        BigInt?
+  image     String? @db.VarChar(512)
+  productid BigInt?
+  alt       String? @db.VarChar(512)
 
-  @@index([productId], map: "Image_productId_fkey")
+  @@ignore
 }
 
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model Prices {
-  id        Int     @id @unique @default(autoincrement())
-  price     Int
-  productId Int
-  product   Product @relation(fields: [productId], references: [id])
+  id        BigInt?
+  price     BigInt?
+  productid BigInt?
 
-  @@index([productId], map: "Prices_productId_fkey")
+  @@ignore
 }
 
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model Product {
-  id           Int      @id @unique @default(autoincrement())
-  title        String   @unique
-  description  String
-  colorHex     String
-  colorName    String
-  status       STATUS?
-  inventory    Int
-  images       Image[]
-  priceOptions Prices[]
-  sizeOptions  Size[]
-  restockNotification RestockNotification[]
+  id          BigInt?
+  title       String? @db.VarChar(512)
+  description String? @db.VarChar(512)
+  colorhex    String? @db.VarChar(512)
+  colorname   String? @db.VarChar(512)
+  status      String? @db.VarChar(512)
+  inventory   BigInt?
+
+  @@ignore
 }
 
-model Contact {
-  id             Int     @id @default(autoincrement())
-  name           String
-  email          String
-  phoneNumber    String?  // optional
-  selectLocation String?  // optional
-  comments       String
-}
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model RestockNotification {
+  id        BigInt?
+  email     String? @db.VarChar(512)
+  productid BigInt?
 
-enum STATUS {
-  AVAILABLE
-  LOW_STOCK
-  OUT_OF_STOCK
-}
-
-// model RestockNotification {
-//   id        Int     @id @default(autoincrement())
-//   email     String
-//   productId Int     @unique
-//   product   Product @relation("ProductToRestock", fields: [productId], references: [id])
-// }
-
-model RestockNotification{
-  id        Int     @id @default(autoincrement())
-  email     String
-  productId Int
-  product   Product @relation(fields: [productId], references: [id])
-  
-  @@index([productId])
+  @@ignore
 }

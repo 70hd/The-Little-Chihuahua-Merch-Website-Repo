@@ -28,7 +28,7 @@ interface ProductType {
   colorName: string;
   colorHex: string;
   priceOptions: PriceOption[];
-  sizeOptions: SizeOption[];  // sizeOptions now works with the optional 'id'
+  sizeOptions: SizeOption[]; // sizeOptions now works with the optional 'id'
   status: string;
   images: { image: string; alt: string; id: number }[];
 }
@@ -36,11 +36,11 @@ export default function Home() {
   const [finalProducts, setFinalProducts] = useState<ProductType[]>([]);
   const [loading, products, error] = useGetProducts();
 
-useEffect(() => {
-  console.log(products)
-  // Ensure products is an array and not null or undefined
-  setFinalProducts(Array.isArray(products) ? products : []);
-}, [loading, products, error]);
+  useEffect(() => {
+    console.log(products);
+    // Ensure products is an array and not null or undefined
+    setFinalProducts(Array.isArray(products) ? products : []);
+  }, [loading, products, error]);
 
   return (
     <main className="flex flex-col gap-[30px] overflow-hidden">
@@ -64,46 +64,48 @@ useEffect(() => {
         <div className="flex flex-wrap gap-3 w-full h-fit justify-between items-center">
           <PickupLocation />
           <Dropdown
-  setProducts={setFinalProducts}
-  products={Array.isArray(products)
-    ? products.map((p) => ({
-        ...p,
-        price: p.priceOptions?.[0]?.price ?? 0,
-      }))
-    : []}
-/>
+            setProducts={setFinalProducts}
+            products={
+              Array.isArray(products)
+                ? products.map((p) => ({
+                    ...p,
+                    price: p.priceOptions?.[0]?.price ?? 0,
+                  }))
+                : []
+            }
+          />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 py-6">
-        {
-  loading
-    ? Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="w-full h-[392px] loader" />
-      ))
-    : Array.isArray(finalProducts) && finalProducts.length > 0
-    ? finalProducts.map((product: ProductType) => (
-        <Product
-          key={product.id}
-          status={product.status}
-          price={formatPrice(product)}
-          title={product.title}
-          image={ product.images?.map((img) => ({
-            id: img.id,
-            productId: product.id,
-            image: img.image,
-            alt: img.alt,
-          })) ?? []}
-          alt="custom alt"
-          size={product.sizeOptions.map((opt) => opt.size)}
-          loading={loading}
-        />
-      ))
-    : <p>No products available.</p>
-}
-            
+          {loading ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="w-full h-[392px] loader" />
+            ))
+          ) : Array.isArray(finalProducts) && finalProducts.length > 0 ? (
+            finalProducts.map((product: ProductType) => (
+              <Product
+                key={product.id}
+                status={product.status}
+                price={formatPrice(product)}
+                title={product.title}
+                image={
+                  product.images?.map((img) => ({
+                    id: img.id,
+                    productId: product.id,
+                    image: img.image,
+                    alt: img.alt,
+                  })) ?? []
+                }
+                alt="custom alt"
+                size={product.sizeOptions.map((opt) => opt.size)}
+                loading={loading}
+              />
+            ))
+          ) : (
+            <p>No products available.</p>
+          )}
         </div>
       </section>
-     
     </main>
   );
 }
