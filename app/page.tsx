@@ -37,8 +37,8 @@ export default function Home() {
   const [loading, products, error] = useGetProducts();
 
 useEffect(() => {
-  // Ensure products is an array and not null
-  setFinalProducts(products || []);
+  // Ensure products is an array and not null or undefined
+  setFinalProducts(Array.isArray(products) ? products : []);
 }, [loading, products, error]);
 
   return (
@@ -79,7 +79,8 @@ useEffect(() => {
     ? Array.from({ length: 6 }).map((_, i) => (
         <div key={i} className="w-full h-[392px] loader" />
       ))
-    : finalProducts.map((product: ProductType) => (
+    : Array.isArray(finalProducts) && finalProducts.length > 0
+    ? finalProducts.map((product: ProductType) => (
         <Product
           key={product.id}
           status={product.status}
@@ -96,6 +97,7 @@ useEffect(() => {
           loading={loading}
         />
       ))
+    : <p>No products available.</p>
 }
             
         </div>
