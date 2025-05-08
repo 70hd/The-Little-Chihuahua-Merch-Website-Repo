@@ -148,11 +148,19 @@ p {
   padding-left: clamp(20px, 16.39vw, 236px);
   padding-right: clamp(20px, 16.39vw, 236px);
 }
+.dynamic-24-y-padding{
+  padding-top: 96px;
+  padding-bottom: 96px;
+}
 
 @media (max-width: 1024px) {
   .dynamic-x-padding {
     padding-left: clamp(20px, 7.5vw, 236px);
     padding-right: clamp(20px, 7.5vw, 236px);
+  }
+  .dynamic-y-padding {
+    padding-top: clamp(6px, 7.5vw, 96px);
+    padding-bottom: clamp(6px, 7.5vw, 96px);
   }
 }
 

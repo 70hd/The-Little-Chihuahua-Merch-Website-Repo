@@ -25,63 +25,23 @@ const PaymentDetails = ({
 }: PriceState) => {
   const { location, time, ship, setPickupDetails } = useContext(PickupContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  useEffect(() => {
-    console.log(ship)
-  },[
-    ship
-  ])
+  const shippingFee = 10
 
   const pricingDetails = [
     { title: "Subtotal", amount: subtotal },
     { title: "Estimated Taxes", amount: estimatedTaxes },
-    { title: "Estimated Order Total", amount: estimatedOrderTotal },
+    ship  && {title: "Shipping Fee", amount: shippingFee },
+    { title: "Estimated Order Total", amount: ship ? estimatedOrderTotal + shippingFee : estimatedOrderTotal },
   ];
 
   const handleToggleModal = () => {
     setIsModalOpen((prev) => !prev);
   };
 
+
   return (
-    <section className="relative lg:w-fit w-full p-6 flex flex-col gap-[30px]">
+    <section className="relative py-6 g-black lg:w-fit sm:min-w-[285px] w-full px-6 flex flex-col gap-[30px]">
       <h2>How to get it</h2>
-{/* {ship === false && (
-  <>
-      {isModalOpen && (
-        <div
-          className="fixed inset-0 bg-black/0 z-0"
-          onClick={handleToggleModal}
-          aria-hidden="true"
-        />
-      )}
-
-      <ChangePickupTimeModal
-        modal={isModalOpen}
-        setModal={setIsModalOpen}
-        setPickupDetails={setPickupDetails}
-      />
-
-      <div className="flex flex-col gap-3">
-        {["location", "time"].map((item, index) => (
-          <button
-            key={index}
-            type="button"
-            onClick={handleToggleModal}
-            className="flex items-center gap-2 cursor-pointer focus:outline-none focus:ring"
-            aria-label={`Change pickup ${item}`}
-          >
-            <Image
-              src="/icons/pin.svg"
-              width={20}
-              height={20}
-              aria-label={`Pickup ${item} Icon`}
-              alt="Pickup location icon"
-            />
-            <span>{item === "location" ? location : time}</span>
-          </button>
-        ))}
-       
-      </div></>)
-} */}
 
 
       {isModalOpen && (
@@ -92,20 +52,22 @@ const PaymentDetails = ({
         />
       )}
 
+    
+ <div className={`flex flex-col gap-3`} >
+      <div className={`flex flex-col relative gap-3 w-fit  ${ship ? "opacity-40 cursor-not-allowed " : ""}`} >
       <ChangePickupTimeModal
+      checkout={true}
         modal={isModalOpen}
         setModal={setIsModalOpen}
         setPickupDetails={setPickupDetails}
       />
-
-      <div className={`flex flex-col gap-3 ${ship ? "opacity-40 cursor-not-allowed " : ""}`} >
         {["location", "time"].map((item, index) => (
           <button
             key={index}
             type="button"
-            onClick={() => !ship && handleToggleModal}
+            onClick={() =>  handleToggleModal()}
             disabled={ship}
-            className={` ${ship ? "cursor-not-allowed" : ""} flex items-center gap-2 cursor-pointer focus:outline-none focus:ring `}
+            className={` ${ship ? "cursor-not-allowed" : ""} flex items-center  gap-2 cursor-pointer focus:outline-none focus:ring `}
             aria-label={`Change pickup ${item}`}
           >
             <Image
@@ -119,9 +81,8 @@ const PaymentDetails = ({
             <span className={`${ship ? "opacity-80 cursor-not-allowed line-through" : ""}`}>{item === "location" ? location : time}</span>
           </button>
         ))}
-       
+        
       </div>
-
       <div className="flex gap-[6px] items-center "> 
           <input
             type="checkbox"
@@ -135,12 +96,15 @@ const PaymentDetails = ({
           />
           <p>Ship it to me</p>
         </div>
+        </div>
 
-      <div className="flex flex-col gap-3">
+     
+
+      <div className="flex w-full flex-col gap-3">
         {pricingDetails.map((item, index) => (
-          <div key={index} className="flex justify-between text-base">
-            <p>{item.title}</p>
-            <p>${item.amount}.00</p>
+          item?.title && <div key={index} className="flex justify-between w-full text-base">
+            <p>{item?.title}</p>
+            <p>${item?.amount}.00</p>
           </div>
         ))}
         <p>Additional taxes and fees will be calculated at checkout.</p>

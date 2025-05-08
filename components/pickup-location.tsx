@@ -14,7 +14,7 @@ const PickupLocation = () => {
   };
 
   return (
-    <div className="relative w-fit h-fit flex gap-6 ">
+    <div className="relative w-fit flex-wrap h-fit flex gap-6 ">
       <div className="flex flex-col">
         <p>Pickup from {location}</p>
         <p>{time}</p>
@@ -27,7 +27,7 @@ const PickupLocation = () => {
           className="fixed inset-0 bg-black/0 z-0"
           onClick={toggleModal}
         />}
-      <ChangePickupTime modal={modal} setModal={setModal} setPickupDetails={setPickupDetails} />
+      <ChangePickupTime modal={modal} checkout={false} setModal={setModal} setPickupDetails={setPickupDetails} />
     </div>
   );
 };

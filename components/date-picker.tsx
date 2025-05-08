@@ -12,14 +12,13 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({ setDate, date }) =>
   const today = new Date(); // Create the date once to optimize comparisons
 
   return (
-    <div className="w-full">
       <DatePicker
         selected={date}
         onChange={(selectedDate: Date | null) => setDate(selectedDate)}
         dateFormat="MMMM d, yyyy"
         placeholderText="Click to select a date"
         minDate={today} // Use today directly here
-        className="w-[344px] text-black/75 border-[0.5px] border-[#221E1F]/75 text-[1.1rem] cursor-pointer rounded-sm p-3 focus:outline-none"
+        className="w-full text-black/75 border-[0.5px] border-[#221E1F]/75 text-[1.1rem] cursor-pointer rounded-sm p-3 focus:outline-none"
         calendarClassName="bg-black text-white rounded-lg shadow-lg p-4"
         dayClassName={(day) =>
           day < today
@@ -28,7 +27,7 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({ setDate, date }) =>
         }
         popperClassName=""
       />
-    </div>
+
   );
 };
 

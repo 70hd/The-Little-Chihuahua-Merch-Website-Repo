@@ -11,6 +11,7 @@ import ProductImages from "@/components/product-images";
 import { useCart } from "@/context/cart-context";
 import Cart from "@/app/modals/cart";
 import Input from "@/components/input";
+import NotFound from "@/app/not-found";
 
 
 // Define the types for PriceOption, SizeOption, and Product
@@ -57,6 +58,7 @@ const ProductPage = () => {
   const [restockNotification, setRestockNotification] = useState<string>(""); // instead of useState()
   const [errors, setErrors] = useState<Errors>({ email: "", size: "" });
   const [restockLoading, setRestockLoading] = useState(false)
+ 
   const ToggleRestockNotification = async () => {
     setRestockLoading(true);
 
@@ -156,14 +158,15 @@ const ProductPage = () => {
       setModal(true);
     }
   };
+console.log(url?.toLowerCase())
+console.log(product?.title)
+  if(url?.toLowerCase() !== product?.title.toLowerCase() || error) {
+    return <NotFound product={true}/>
+  }
 
-
-
-  if (error)
-    return <p className="px-4 py-8 text-red-600">Error loading product.</p>;
 
   return (
-    <div className="flex flex-col lg:flex-row px-4 md:px-16 lg:px-36 xl:px-60 gap-8 py-24 pb-12 items-center">
+    <div className="flex flex-col lg:flex-row px-4 md:px-16 lg:px-36 xl:px-60 gap-8 py-12  items-center">
       {/* Product images */}
       {/* <ProductImages
         imageOptions={product?.images}
@@ -176,7 +179,7 @@ const ProductPage = () => {
   })) || []}  // Fallback to empty array if `product?.images` is undefined
 />
 
-      <div className="w-full h-fit flex flex-col gap-6 py-12">
+      <div className="w-full h-fit flex flex-col gap-6 ">
         <div className="w-full flex flex-col">
           <div className="flex gap-6">
             <p>
@@ -276,7 +279,7 @@ const ProductPage = () => {
               />
             </div>
 
-            <div className="flex gap-6 items-center">
+            <div className="flex flex-wrap gap-6 items-center">
               <Quantity setNumber={setQuantity} number={quantity} />
               <Button primary={true} action={toggleSubmit}>
                 Add to cart

@@ -19,7 +19,12 @@ export async function POST(req: Request) {
         comments: body.comments,
       },
     });
-    const zapRes = await fetch("https://hooks.zapier.com/hooks/catch/22705783/2p59rpf/", {
+    const zapierUrl = process.env.ZAPIER_CONTACT_FORM_WEBHOOK_URL;
+
+    if (!zapierUrl) {
+      throw new Error("Zapier webhook URL is not defined");
+    }
+    const zapRes = await fetch(zapierUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

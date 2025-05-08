@@ -108,7 +108,7 @@ const QuickAdd = ({
 
   return (
     <div
-      className="absolute  bottom-2  left-2 right-2  z-10 cursor-pointer"
+      className="absolute  bottom-2  left-2 right-2  z- cursor-pointer"
       onClick={() => !cartModal && setShowSizeOptions(true)}
     >
       {showSizeOptions ? (

@@ -63,17 +63,19 @@ export async function GET() {
     for (const product of productsBackInStock) {
       const usersForProduct = restockUsers.filter((user) => user.productId === product.id);
       if (usersForProduct.length > 0) {
+        const zapierUrl = process.env.ZAPIER_RESTOCK_NOTIFICATION_WEBHOOK_URL;
+
+        if (!zapierUrl) {
+          throw new Error("Zapier webhook URL is not defined");
+        }
         const productName = getProducts.find((prev) => prev.id === product.id)?.title;
             // Trigger Zapier webhook for these emails
-            await fetch("https://hooks.zapier.com/hooks/catch/22705783/2n43tvy/", {
+            await fetch(zapierUrl, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
-              // body: JSON.stringify({
-              //   emails: usersForProduct.map((u) => u.email),
-              // }),
-             
+    
               body: JSON.stringify({
                 productName: productName,
                 emails: usersForProduct.map((u) => u.email),

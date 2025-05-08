@@ -75,12 +75,11 @@ const CartDisplay: React.FC<CartDisplayProps> = ({ button,setPrice, checkout }) 
 
       <section
         className={`flex flex-col gap-9 ${
-          checkout ? "lg:h-fit h-[606px] overflow-y-auto" : ""
+          checkout ? "lg:h-fit h-full max-h-[606px] overflow-y-auto" : ""
         }`}
         aria-label="Cart items"
       >
         {cartItems.map((item: CartItem, index: number) => {
-          console.log(cartItems)
           return (
           <CartProductCard
             key={index}

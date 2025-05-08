@@ -18,22 +18,22 @@ useEffect(() => {
 }, [loading, products, error]);
 
   return (
-    <main className="flex flex-col gap-[30px]">
+    <main className="flex flex-col gap-[30px] overflow-hidden">
       <section
-        className="w-full h-[392px] bg-[url('https://res.cloudinary.com/da8kkevrh/image/upload/w_1000,ar_1:1,c_fill,g_auto,e_art:hokusai/v1746583790/2023_TLC_Product_46-min_n2uyam.jpg')] bg-no-repeat bg-cover z-0 dynamic-x-padding py-24 flex flex-col relative"
+        className="w-full  h-[392px] bg-[url('/images/hero.png')]  text-white bg-no-repeat bg-cover z-0 dynamic-x-padding dynamic-24-y-padding bg-top flex flex-1 flex-col relative"
         aria-label="Hero banner"
       >
         <h1>
           Your pick. <br /> It's free.
         </h1>
-        <p className="w-[392px]">
+        <p className="w-full max-w-[392px]">
           Join Taco Bell Rewards to get a free Cantina Chicken Crispy Taco,
           Beefy 5-Layer Burrito, or Soft Taco.
         </p>
       </section>
 
       <section
-        className="flex flex-col gap-[30px] py-12 dynamic-x-padding w-full"
+        className="flex flex-col gap-[30px]  md:py-12 dynamic-x-padding w-full"
         aria-label="Product and location section"
       >
         <div className="flex flex-wrap gap-3 w-full h-fit justify-between items-center">
@@ -41,7 +41,7 @@ useEffect(() => {
           <Dropdown setProducts={setFinalProducts} products={products || []} />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 py-6">
         {
   loading
     ? Array.from({ length: 6 }).map((_, i) => (
