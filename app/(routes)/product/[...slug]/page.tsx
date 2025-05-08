@@ -20,7 +20,7 @@ interface PriceOption {
 }
 
 interface SizeOption {
-  id: number;
+  id?: number; // make optional
   size: string;
   status?: string;
 }
@@ -105,7 +105,7 @@ const ProductPage = () => {
         id: Number(filteredProduct.id), // Ensure id is a number
         sizeOptions: filteredProduct.sizeOptions.map((sizeOption) => ({
           ...sizeOption,
-          id: sizeOption.id ?? 0, // Ensure id is included
+          id: sizeOption.id ?? 0,
         })),
         images: filteredProduct.images ?? [],
       });
