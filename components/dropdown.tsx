@@ -43,7 +43,7 @@ const Dropdown = ({
     }
     setProducts(sortedProducts);
   };
-
+  if (!Array.isArray(products)) return null;
   return (
     <div className="w-fit h-fit bg-white z-10 relative md:min-w-[192px] flex items-center justify-end">
       <button
