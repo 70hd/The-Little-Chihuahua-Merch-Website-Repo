@@ -63,12 +63,14 @@ useEffect(() => {
         <div className="flex flex-wrap gap-3 w-full h-fit justify-between items-center">
           <PickupLocation />
           <Dropdown
-            setProducts={setFinalProducts}
-            products={(products || []).map((p) => ({
-              ...p,
-              price: p.priceOptions?.[0]?.price ?? 0,
-            }))}
-          />
+  setProducts={setFinalProducts}
+  products={Array.isArray(products)
+    ? products.map((p) => ({
+        ...p,
+        price: p.priceOptions?.[0]?.price ?? 0,
+      }))
+    : []}
+/>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 py-6">
