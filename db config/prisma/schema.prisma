@@ -9,52 +9,64 @@ datasource db {
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model Size {
-  id        BigInt?
-  size      String? @db.VarChar(512)
-  productid BigInt?
-  inventory BigInt?
-  status    String? @db.VarChar(512)
-
-  @@ignore
+  id        Int          @id @default(autoincrement())
+  size      String
+  productId Int
+  inventory Int
+  status    Size_status?
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model Image {
-  id        BigInt?
-  image     String? @db.VarChar(512)
-  productid BigInt?
-  alt       String? @db.VarChar(512)
-
-  @@ignore
+  id        Int    @id @default(autoincrement())
+  image     String
+  productId Int
+  alt       String
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model Prices {
-  id        BigInt?
-  price     BigInt?
-  productid BigInt?
-
-  @@ignore
+  id        Int @id @default(autoincrement())
+  price     Int
+  productId Int
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model Product {
-  id          BigInt?
-  title       String? @db.VarChar(512)
-  description String? @db.VarChar(512)
-  colorhex    String? @db.VarChar(512)
-  colorname   String? @db.VarChar(512)
-  status      String? @db.VarChar(512)
-  inventory   BigInt?
-
-  @@ignore
+  id          Int             @id @default(autoincrement())
+  title       String          @unique
+  description String
+  colorHex    String
+  colorName   String
+  status      Product_status?
+  inventory   Int
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model RestockNotification {
-  id        BigInt?
-  email     String? @db.VarChar(512)
-  productid BigInt?
+  id        Int    @id @default(autoincrement())
+  email     String
+  productId Int
+}
 
-  @@ignore
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Contact {
+  id             Int     @id @default(autoincrement())
+  name           String
+  email          String
+  phoneNumber    String?
+  selectLocation String?
+  comments       String
+}
+
+enum Size_status {
+  AVAILABLE
+  LOW_STOCK
+  OUT_OF_STOCK
+}
+
+enum Product_status {
+  AVAILABLE
+  LOW_STOCK
+  OUT_OF_STOCK
 }
