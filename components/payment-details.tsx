@@ -26,13 +26,14 @@ const PaymentDetails = ({
   const { location, time, ship, setPickupDetails } = useContext(PickupContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const shippingFee = 10
+  const isShippingFee = ship && { title: "Shipping Fee", amount: shippingFee }
 
   const pricingDetails = [
     { title: "Subtotal", amount: subtotal },
     { title: "Estimated Taxes", amount: estimatedTaxes },
-    ship  && {title: "Shipping Fee", amount: shippingFee },
+    {...isShippingFee},
     { title: "Estimated Order Total", amount: ship ? estimatedOrderTotal + shippingFee : estimatedOrderTotal },
-  ];
+  ]
 
   const handleToggleModal = () => {
     setIsModalOpen((prev) => !prev);
