@@ -6,6 +6,7 @@ import CartProductCard from "./cart-product-card";
 import Button from "./button";
 
 type CartItem = {
+  image: { id: number; productId: number; image: string; alt: string; }[];
   id: number | string;
   title: string;
   price: number | { price: number };
