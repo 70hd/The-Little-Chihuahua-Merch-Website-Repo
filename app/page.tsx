@@ -37,6 +37,7 @@ export default function Home() {
   const [loading, products, error] = useGetProducts();
 
 useEffect(() => {
+  console.log(products)
   // Ensure products is an array and not null or undefined
   setFinalProducts(Array.isArray(products) ? products : []);
 }, [loading, products, error]);
