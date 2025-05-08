@@ -36,7 +36,7 @@ interface Product {
   colorName: string;
   colorHex: string;
   priceOptions: PriceOption[];
-  sizeOptions: SizeOption[];
+  sizeOptions: Array<SizeOption & { id: number }>;
   status: string;
   images: { image: string; alt: string; id: number }[];
 }
