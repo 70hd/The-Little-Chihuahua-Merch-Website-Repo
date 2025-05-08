@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import useCurrentUrl from "@/hooks/use-current-url";
@@ -12,7 +10,6 @@ import { useCart } from "@/context/cart-context";
 import Cart from "@/app/modals/cart";
 import Input from "@/components/input";
 import NotFound from "@/app/not-found";
-
 
 // Define the types for PriceOption, SizeOption, and Product
 interface PriceOption {
@@ -30,13 +27,13 @@ interface Errors {
 }
 
 interface Product {
-  id: number | number;
+  id: number;
   title: string;
   description: string;
   colorName: string;
   colorHex: string;
   priceOptions: PriceOption[];
-  sizeOptions: Array<SizeOption & { id: number }>;
+  sizeOptions: SizeOption[];  // sizeOptions now works with the optional 'id'
   status: string;
   images: { image: string; alt: string; id: number }[];
 }
@@ -55,9 +52,9 @@ const ProductPage = () => {
   const [sizeError, setSizeError] = useState(false);
   const [price, setPrice] = useState<PriceOption | number>(0);
   const [modal, setModal] = useState(false);
-  const [restockNotification, setRestockNotification] = useState<string>(""); // instead of useState()
+  const [restockNotification, setRestockNotification] = useState<string>(""); 
   const [errors, setErrors] = useState<Errors>({ email: "", size: "" });
-  const [restockLoading, setRestockLoading] = useState(false)
+  const [restockLoading, setRestockLoading] = useState(false);
  
   const ToggleRestockNotification = async () => {
     setRestockLoading(true);
@@ -103,9 +100,9 @@ const ProductPage = () => {
       setProduct({
         ...filteredProduct,
         id: Number(filteredProduct.id), // Ensure id is a number
-        sizeOptions: filteredProduct.sizeOptions.map((sizeOption) => ({
+        sizeOptions: filteredProduct.sizeOptions.map((sizeOption, index) => ({
           ...sizeOption,
-          id: sizeOption.id ?? 0,
+          id: sizeOption.id ?? index, // fallback to index if id doesn't exist
         })),
         images: filteredProduct.images ?? [],
       });
@@ -158,26 +155,20 @@ const ProductPage = () => {
       setModal(true);
     }
   };
-console.log(url?.toLowerCase())
-console.log(product?.title)
+
   if(url?.toLowerCase() !== product?.title.toLowerCase() || error) {
     return <NotFound product={true}/>
   }
 
-
   return (
     <div className="flex flex-col lg:flex-row px-4 md:px-16 lg:px-36 xl:px-60 gap-8 py-12  items-center">
-      {/* Product images */}
-      {/* <ProductImages
-        imageOptions={product?.images}
-      /> */}
-<ProductImages
-  imageOptions={product?.images?.map((img,index) => ({
-    id: img.id,  // Ensure the id is being passed, since your `ImageOption` expects it
-    image: img.image,
-    alt: img.alt
-  })) || []}  // Fallback to empty array if `product?.images` is undefined
-/>
+      <ProductImages
+        imageOptions={product?.images?.map((img,index) => ({
+          id: img.id,  
+          image: img.image,
+          alt: img.alt
+        })) || []}  
+      />
 
       <div className="w-full h-fit flex flex-col gap-6 ">
         <div className="w-full flex flex-col">
@@ -223,7 +214,6 @@ console.log(product?.title)
           </div>
         </div>
 
-        {/* Size selector */}
         {product?.status !== "OUT_OF_STOCK" ? (
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2 relative">
@@ -300,13 +290,12 @@ console.log(product?.title)
                   id="email"
                   name="email"
                   value={restockNotification}
-                  action={(e) => HandleRestockNotificationChange(e)} // use onChange here
+                  action={(e) => HandleRestockNotificationChange(e)}
                   placeholder="Email"
                 />
               </div>
               <Button primary={false} action={ToggleRestockNotification}>
-                {/* use onClick here */}
-               {restockLoading? "...Loading":"Notify Me"}
+               {restockLoading ? "...Loading" : "Notify Me"}
               </Button>
             </div>
           </div>
