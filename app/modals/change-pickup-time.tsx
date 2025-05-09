@@ -130,22 +130,31 @@ const ChangePickupTime = ({ modal, setModal, setPickupDetails, checkout = false 
                 <p className="text-[#CD3626]" id="location-error">{error.location}</p>
               )}
               {!selectOption.onClick ? (
-                <select
-                  name={selectOption.name}
-                  value={formData[selectOption.name as "location" | "date"]}
-                  onChange={handleChange}
-                  className="border-[.5px] text-[1.1rem] text-black/75 border-black/75 p-3 pr-10 rounded w-full appearance-none focus:outline-none focus:ring-0"
-                  aria-describedby={selectOption.name === "location" ? "location-error" : undefined}
-                  aria-label={selectOption.prompt}
-                >
-                  <option value="">{selectOption.prompt}</option>
-                  {selectOption.options &&
-                    selectOption.options.map((opt, i) => (
-                      <option key={i} value={opt.location}>
-                        {opt.location}
-                      </option>
-                    ))}
-                </select>
+                <div className="relative w-full">
+  <select
+    name={selectOption.name}
+    value={formData[selectOption.name as "location" | "date"]}
+    onChange={handleChange}
+    className="border-[0.5px] text-[1.1rem] text-black/75 border-black/75 p-3 pr-10 rounded w-full appearance-none focus:outline-none focus:ring-0"
+    aria-describedby={selectOption.name === "location" ? "location-error" : undefined}
+    aria-label={selectOption.prompt}
+  >
+    <option value="">{selectOption.prompt}</option>
+    {selectOption.options &&
+      selectOption.options.map((opt, i) => (
+        <option key={i} value={opt.location}>
+          {opt.location}
+        </option>
+      ))}
+  </select>
+  <Image
+    src={`/icons/right-arrow.svg`}
+    width={16}
+    height={16}
+    alt="Dropdown arrow"
+    className="pointer-events-none absolute right-4 top-1/2 transform -translate-y-1/2"
+  />
+</div>
               ) : (
                 <div className="flex flex-col gap-3 w-full ">
                   {selectOption.name === "date" && error.date && (
@@ -162,17 +171,7 @@ const ChangePickupTime = ({ modal, setModal, setPickupDetails, checkout = false 
                   />
                 </div>
               )}
-              <Image
-                src={`/icons/${selectOption.onClick ? "calendar.svg" : "right-arrow.svg"}`}
-                width={16}
-                height={16}
-                alt="Dropdown arrow"
-                className={`pointer-events-none absolute ${
-                  (selectOption.name === "date" && error.date) || (selectOption.name === "location" && error.location)
-                    ? "top-[60px]"
-                    : "top-1/2"
-                } right-4 transform -translate-y-1/2`}
-              />
+
             </div>
           ))}
         </form>

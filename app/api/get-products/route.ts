@@ -4,61 +4,39 @@ const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    await prisma.product.updateMany({
-      where: {
-        inventory: {
-          lte: 10,
-          gt: 0,
-        },
-      },
-      data: {
-        status: "LOW_STOCK",
-      },
-      
-    });
-    await prisma.product.updateMany({
-      where: {
-        inventory: {
-          gt: 10,
-        },
-      },
-      data: {
-        status: "AVAILABLE",
-      },
-    });
-    await prisma.product.updateMany({
-      where: {
-        inventory: 0,
-      },
-      data: {
-        status: "OUT_OF_STOCK",
-      },
-    });
-    await prisma.size.updateMany({
-      where: {
-        inventory: 0,
-      },
-      data: {
-        status: "OUT_OF_STOCK",
-      },
-    });
+    await Promise.all([
+      prisma.product.updateMany({
+        where: { inventory: { lte: 10, gt: 0 } },
+        data: { status: "LOW_STOCK" },
+      }),
+      prisma.product.updateMany({
+        where: { inventory: { gt: 10 } },
+        data: { status: "AVAILABLE" },
+      }),
+      prisma.product.updateMany({
+        where: { inventory: 0 },
+        data: { status: "OUT_OF_STOCK" },
+      }),
+      prisma.size.updateMany({
+        where: { inventory: 0 },
+        data: { status: "OUT_OF_STOCK" },
+      }),
+    ]);
+    const [getProducts, getPrices, getSizes, getImages, restockUsers] = await Promise.all([
+      prisma.product.findMany(),
+      prisma.prices.findMany(),
+      prisma.size.findMany(),
+      prisma.image.findMany(),
+      prisma.restockNotification.findMany(),
+    ]);
 
-    const getProducts = await prisma.product.findMany();
-    const getPrices = await prisma.prices.findMany();
-    const getSizes = await prisma.size.findMany();
-    const getImages = await prisma.image.findMany();
     const sortProducts = getProducts.map((product) => {
       const productId = Number(product.id);
 
-      const productPrices = getPrices.filter(
-        (p) => Number(p.productId) === productId
-      );
-      const productSizes = getSizes.filter(
-        (s) => Number(s.productId) === productId
-      );
-      const productImages = getImages.filter(
-        (i) => Number(i.productId) === productId
-      );
+      const productPrices = getPrices.filter((p) => Number(p.productId) === productId);
+      const productSizes = getSizes.filter((s) => Number(s.productId) === productId);
+      const productImages = getImages.filter((i) => Number(i.productId) === productId);
+
       return {
         id: product.id,
         title: product.title,
@@ -67,62 +45,59 @@ export async function GET() {
         colorName: product.colorName,
         status: product.status,
         inventory: product.inventory,
-        priceOptions: [...productPrices],
-        sizeOptions: [...productSizes],
-        images: [...productImages],
+        priceOptions: productPrices,
+        sizeOptions: productSizes,
+        images: productImages,
       };
     });
 
-    const restockUsers = await prisma.restockNotification.findMany();
 
-    const productsBackInStock = getProducts.filter(
-      (product) => product.inventory && product.inventory >= 1
-    );
-
+    const productsBackInStock = getProducts.filter((product) => product.inventory >= 1);
     const notifyUsers: { productId: number; emails: string[] }[] = [];
+
+    const zapierUrl = process.env.ZAPIER_RESTOCK_NOTIFICATION_WEBHOOK_URL;
+    if (!zapierUrl) throw new Error("Zapier webhook URL is not defined");
+
     for (const product of productsBackInStock) {
-      const usersForProduct = restockUsers.filter(
-        (user) => user.productId === product.id
-      );
+      const usersForProduct = restockUsers.filter((user) => user.productId === product.id);
+
       if (usersForProduct.length > 0) {
-        const zapierUrl = process.env.ZAPIER_RESTOCK_NOTIFICATION_WEBHOOK_URL;
+        try {
+          await fetch(zapierUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              productName: product.title,
+              emails: usersForProduct
+                .map((u) => u.email)
+                .filter((email): email is string => email !== null),
+            }),
+          });
 
-        if (!zapierUrl) {
-          throw new Error("Zapier webhook URL is not defined");
-        }
-        const productName = getProducts.find(
-          (prev) => prev.id === product.id
-        )?.title;
-
-        await fetch(zapierUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-
-          body: JSON.stringify({
-            productName: productName,
-            emails: usersForProduct.map((u) => u.email),
-          }),
-        });
-        notifyUsers.push({
-          productId: Number(product.id),
-          emails: usersForProduct
-            .map((u) => u.email)
-            .filter((email): email is string => email !== null),
-        });
-
-        await prisma.restockNotification.deleteMany({
-          where: {
+          notifyUsers.push({
             productId: product.id,
-          },
-        });
+            emails: usersForProduct
+              .map((u) => u.email)
+              .filter((email): email is string => email !== null),
+          });
+
+          await prisma.restockNotification.deleteMany({
+            where: { productId: product.id },
+          });
+        } catch (zapError) {
+          console.error(`Failed to notify users for product ${product.id}`, zapError);
+        }
       }
     }
 
-    return new Response(JSON.stringify(sortProducts));
+    return new Response(JSON.stringify(sortProducts), {
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error) {
     console.error("Could not fetch products", error);
-    return new Response(JSON.stringify({ error }));
+    return new Response(JSON.stringify({ error: "Internal Server Error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }

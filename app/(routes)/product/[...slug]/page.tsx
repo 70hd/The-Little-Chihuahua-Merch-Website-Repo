@@ -199,7 +199,7 @@ const ProductPage = () => {
             )}
           </div>
 
-          <h1 className="text-2xl font-semibold">{product?.title}</h1>
+          <h1 className="text-2xl font-semibold">{loading ? url: product?.title}</h1>
         </div>
 
         <p>{product?.description}</p>
@@ -223,7 +223,7 @@ const ProductPage = () => {
           </div>
         </div>
 
-        {product?.status !== "OUT_OF_STOCK" ? (
+        { product?.status !== "OUT_OF_STOCK" ? !loading && (
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2 relative">
               <label
@@ -285,7 +285,7 @@ const ProductPage = () => {
               </Button>
             </div>
           </div>
-        ) : (
+        ) : !loading && (
           <div className="flex flex-col gap-3">
             <label
               htmlFor="email"

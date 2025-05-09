@@ -172,3 +172,7 @@ p {
     left: 100%;
   }
 }
+
+.react-datepicker-popper.w-full {
+  width: 100% !important;
+}

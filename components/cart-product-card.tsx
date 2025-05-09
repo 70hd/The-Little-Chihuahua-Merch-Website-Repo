@@ -45,7 +45,6 @@ const CartProductCard = ({
         width={285}
         height={285}
         className="md:min-w-[285px] w-full  aspect-square object-cover"
-        priority
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
          loading="lazy"
