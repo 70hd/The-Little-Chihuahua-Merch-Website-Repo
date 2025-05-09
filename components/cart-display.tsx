@@ -1,12 +1,11 @@
 import { useCart } from "@/context/cart-context";
 import Image from "next/image";
-import Link from "next/link";
 import React, { useEffect } from "react";
 import CartProductCard from "./cart-product-card";
 import Button from "./button";
 
 type CartItem = {
-  image: { id: number; productId: number; image: string; alt: string; }[];
+  image: { id: number; productId: number; image: string; alt: string }[];
   id: number | string;
   title: string;
   price: number | { price: number };
@@ -25,8 +24,11 @@ interface CartDisplayProps {
   setPrice?: React.Dispatch<React.SetStateAction<PriceState>>;
 }
 
-
-const CartDisplay: React.FC<CartDisplayProps> = ({ button,setPrice, checkout }) => {
+const CartDisplay: React.FC<CartDisplayProps> = ({
+  button,
+  setPrice,
+  checkout,
+}) => {
   const { cartItems, removeFromCart, updateQuantity } = useCart();
 
   const getSafePrice = (price: number | { price: number }): number => {
@@ -36,23 +38,22 @@ const CartDisplay: React.FC<CartDisplayProps> = ({ button,setPrice, checkout }) 
   };
   useEffect(() => {
     if (!setPrice) return;
-  
+
     let subtotal = 0;
     cartItems.forEach((item: CartItem) => {
       subtotal += getSafePrice(item.price) * item.quantity;
     });
-  
+
     const taxRate = 0.08625;
     const estimatedTaxes = Math.round(subtotal * taxRate);
     const estimatedOrderTotal = Math.round(subtotal + estimatedTaxes);
-  
+
     setPrice({
       subtotal,
       estimatedTaxes,
       estimatedOrderTotal,
     });
   }, [cartItems, setPrice]);
-  console.log(cartItems,"items")
   return (
     <div className="h-fit w-full lg:w-fit flex flex-col gap-9">
       <header className="w-full bg-white py-3 flex justify-between sticky z-50 border-b border-black/25 top-0">
@@ -82,25 +83,25 @@ const CartDisplay: React.FC<CartDisplayProps> = ({ button,setPrice, checkout }) 
       >
         {cartItems.map((item: CartItem, index: number) => {
           return (
-          <CartProductCard
-            key={index}
-            product={{
-              id: Number(item.id),
-              title: item.title,
-              image: item.image,
-              alt: "custom alt",
-              price: getSafePrice(item.price),
-              quantity: item.quantity,
-              size: item.size,
-              colorName: item.color,
-              color: item.color
-            }}
-            onUpdateQuantity={(quantity) =>
-              updateQuantity(item.size, item.title, quantity)
-            }
-            onRemove={() => removeFromCart(item.size, item.title)}
-          />
-        )})}
+            <CartProductCard
+              key={index}
+              product={{
+                id: Number(item.id),
+                title: item.title,
+                image: item.image,
+                price: getSafePrice(item.price),
+                quantity: item.quantity,
+                size: item.size,
+                colorName: item.color,
+                color: item.color,
+              }}
+              onUpdateQuantity={(quantity) =>
+                updateQuantity(item.size, item.title, quantity)
+              }
+              onRemove={() => removeFromCart(item.size, item.title)}
+            />
+          );
+        })}
       </section>
 
       {button && (

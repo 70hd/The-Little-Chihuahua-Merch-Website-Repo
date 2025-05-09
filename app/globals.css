@@ -6,11 +6,11 @@
 }
 @font-face {
   font-family: "HvDTrial Brandon Grotesque";
-  src: url("/fonts/HvDTrial_Brandon_Grotesque_medium.otf")
+  src: url("/fonts/HvDTrial_Brandon_Grotesque_medium.otf");
 }
 @font-face {
   font-family: "HvDTrial Brandon Grotesque Bold";
-  src: url("/fonts/HvDTrial_Brandon_Grotesque_bold.otf")
+  src: url("/fonts/HvDTrial_Brandon_Grotesque_bold.otf");
 }
 :root {
   --background: #fff;
@@ -37,118 +37,94 @@ body {
   font-family: "HvDTrial Brandon Grotesque", "Nord", sans-serif;
 }
 
-
 h1 {
-  font-family: "Nord";       /* Uses Nord font for brand identity */
-  font-weight: 400;          /* Regular weight */
-  font-size: 2rem;           /* 32px font size */
+  font-family: "Nord";
+  font-weight: 400;
+  font-size: 2rem;
 }
 h2 {
   font-family: "Nord";
   font-weight: 400;
-  font-size: 1.5rem;         /* 24px font size */
+  font-size: 1.5rem;
 }
 
 h3 {
   font-family: "Nord";
   font-weight: 400;
-  font-size: 1.1rem;         /* Approximately 17.6px */
+  font-size: 1.1rem;
 }
 h4 {
   font-family: "HvDTrial Brandon Grotesque";
   font-weight: 400;
-  font-size: 1.1rem;         /* Approximately 17.6px */
-  line-height: 1.5rem;       /* Improves readability */
+  font-size: 1.1rem;
+  line-height: 1.5rem;
 }
 h5 {
   font-family: "HvDTrial Brandon Grotesque Bold";
-  font-weight: 600;          /* Semi-bold */
+  font-weight: 600;
   font-size: 1.1rem;
   line-height: 1.5rem;
 }
 p {
-  font-family: "HvDTrial Brandon Grotesque" ;
-  font-size: 1.1rem;           /* 16px */
+  font-family: "HvDTrial Brandon Grotesque";
+  font-size: 1.1rem;
   font-weight: 400;
   line-height: 1.5rem;
 }
 .calender-text {
-  font-family: "HvDTrial Brandon Grotesque" ;
-  font-size: 1.1rem;           /* 16px */
+  font-family: "HvDTrial Brandon Grotesque";
+  font-size: 1.1rem;
   font-weight: 400;
   line-height: 1.5rem;
-  
 }
-/* styles.css */
-/* Remove the background color of the calendar */
 .react-datepicker__month {
-  background-color: transparent !important;  /* Override default background */
-  
+  background-color: transparent !important;
 }
 
-/* Set the calendar background to transparent */
 .react-datepicker__calendar {
-  background-color: transparent !important;  /* Override default background */
-  
+  background-color: transparent !important;
 }
 .no-shadow {
   box-shadow: none !important;
 }
 
-/* Weekday names */
 .react-datepicker__day-name {
-  font-family: "HvDTrial Brandon Grotesque" ;
-  font-size: 1.1rem;           /* 16px */
+  font-family: "HvDTrial Brandon Grotesque";
+  font-size: 1.1rem;
   font-weight: 400;
-  
+
   line-height: 1.5rem;
 }
 
-/* Day cells */
 .calendar-day {
-  font-family: "HvDTrial Brandon Grotesque" ;
-  font-size: 1.1rem;           /* 16px */
+  font-family: "HvDTrial Brandon Grotesque";
+  font-size: 1.1rem;
   font-weight: 400;
   line-height: 1.5rem;
-  /* width: 2.5rem;
-  height: 2.5rem; */
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 0.5rem;
-
 }
 
-/* Optional: Remove the gray background from the selected date */
 .react-datepicker__day--selected {
-  background-color: #000000 !important}  /* Change to your preferred color
-
-
-
-/* .react-datepicker__day--today {
-  background-color: #000000 !important; 
-  opacity: 0.1;
-} */
+  background-color: #000000 !important;
+}
 
 .react-datepicker__day--today {
-  
-  background-color: transparent !important; /* Make today NOT colored */
-  color: inherit !important; 
+  background-color: transparent !important;
+  color: inherit !important;
 }
 .max-gap-6px {
   display: flex;
-  flex-wrap: wrap; /* if you want items to wrap */
-  gap: clamp(1px, 1vw, 5px); /* dynamic gap: 1px to 6px */
+  flex-wrap: wrap;
+  gap: clamp(1px, 1vw, 5px);
 }
-/* .dynamic-padding {
-  padding-left: clamp(20px, 7.5vw, 236px);
-  padding-right: clamp(20px, 7.5vw, 236px);
-} */
 .dynamic-x-padding {
   padding-left: clamp(20px, 16.39vw, 236px);
   padding-right: clamp(20px, 16.39vw, 236px);
 }
-.dynamic-24-y-padding{
+.dynamic-24-y-padding {
   padding-top: 96px;
   padding-bottom: 96px;
 }
@@ -165,21 +141,26 @@ p {
 }
 
 .loader {
-  background: #f3f3f3;        /* Light gray background */
+  background: #f3f3f3; /* Light gray background */
   position: relative;
   overflow: hidden;
   z-index: 0;
 }
 
 .loader::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   z-index: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(200, 200, 200, 0.4) 50%, rgba(255, 255, 255, 0) 100%);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(200, 200, 200, 0.4) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
   animation: loader 1.5s infinite linear;
 }
 

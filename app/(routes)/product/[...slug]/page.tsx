@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import useCurrentUrl from "@/hooks/use-current-url";
@@ -12,13 +12,12 @@ import Cart from "@/app/modals/cart";
 import Input from "@/components/input";
 import NotFound from "@/app/not-found";
 
-// Define the types for PriceOption, SizeOption, and Product
 interface PriceOption {
   price: number;
 }
 
 interface SizeOption {
-  id?: number; // make optional
+  id?: number;
   size: string;
   status?: string;
 }
@@ -34,7 +33,7 @@ interface Product {
   colorName: string;
   colorHex: string;
   priceOptions: PriceOption[];
-  sizeOptions: SizeOption[];  // sizeOptions now works with the optional 'id'
+  sizeOptions: SizeOption[];
   status: string;
   images: { image: string; alt: string; id: number }[];
 }
@@ -53,10 +52,10 @@ const ProductPage = () => {
   const [sizeError, setSizeError] = useState(false);
   const [price, setPrice] = useState<PriceOption | number>(0);
   const [modal, setModal] = useState(false);
-  const [restockNotification, setRestockNotification] = useState<string>(""); 
+  const [restockNotification, setRestockNotification] = useState<string>("");
   const [errors, setErrors] = useState<Errors>({ email: "", size: "" });
   const [restockLoading, setRestockLoading] = useState(false);
- 
+
   const ToggleRestockNotification = async () => {
     setRestockLoading(true);
 
@@ -79,11 +78,10 @@ const ProductPage = () => {
         const data = await res.json();
         throw new Error(data.message || "Something went wrong");
       }
-
     } catch (err: any) {
       setErrors((prev) => ({ ...prev, email: err.message }));
     } finally {
-      setRestockNotification("")
+      setRestockNotification("");
       setRestockLoading(false);
     }
   };
@@ -94,21 +92,20 @@ const ProductPage = () => {
     setRestockNotification(e.target.value);
   };
 
-  // Set product on URL change
+
   useEffect(() => {
     const filteredProduct = products?.find((p) => p.title === url);
     if (filteredProduct) {
-      
       setProduct({
         ...filteredProduct,
-        id: Number(filteredProduct.id), // Ensure id is a number
+        id: Number(filteredProduct.id), 
         sizeOptions: filteredProduct.sizeOptions.map((sizeOption, index) => ({
           ...sizeOption,
-          id: index, // fallback to index if id doesn't exist
+          id: index, 
         })),
         images: filteredProduct.images ?? [],
       });
-    
+
       setColor({
         colorName: filteredProduct.colorName,
         colorHex: filteredProduct.colorHex,
@@ -117,7 +114,7 @@ const ProductPage = () => {
     }
   }, [products, url]);
 
-  // Update price when size changes
+
   useEffect(() => {
     if (product?.sizeOptions?.length === 1) {
       setSize(product.sizeOptions[0]);
@@ -137,7 +134,6 @@ const ProductPage = () => {
     }
   }, [product, size]);
 
-  // Handle add to cart
   const toggleSubmit = () => {
     if (size.size === "Select Size") {
       setSizeError(true);
@@ -152,30 +148,35 @@ const ProductPage = () => {
         color: color.colorName,
         size: size.size,
         quantity,
-        image: product.images?.map((img) => ({
-          id: img.id,
-          productId: product.id,
-          image: img.image,
-          alt: img.alt,
-        })) ?? [],
-        imageAlt: "",
+        image:
+          product.images?.map((img) => ({
+            id: img.id,
+            productId: product.id,
+            image: img.image,
+            alt: img.alt,
+          })) ?? [],
       });
       setModal(true);
     }
   };
 
-  if(url?.toLowerCase() !== product?.title.toLowerCase() && !loading || error) {
-    return <NotFound product={true}/>
+  if (
+    (url?.toLowerCase() !== product?.title.toLowerCase() && !loading) ||
+    error
+  ) {
+    return <NotFound product={true} />;
   }
 
   return (
     <div className="flex flex-col lg:flex-row px-4 md:px-16 lg:px-36 xl:px-60 gap-8 py-12  items-center">
       <ProductImages
-        imageOptions={product?.images?.map((img,index) => ({
-          id: img.id,  
-          image: img.image,
-          alt: img.alt
-        })) || []}  
+        imageOptions={
+          product?.images?.map((img, index) => ({
+            id: img.id,
+            image: img.image,
+            alt: img.alt,
+          })) || []
+        }
       />
 
       <div className="w-full h-fit flex flex-col gap-6 ">
@@ -204,7 +205,7 @@ const ProductPage = () => {
         <p>{product?.description}</p>
 
         <div className="flex flex-col gap-2">
-          <p>Color: {color.colorName}</p>
+          <p>Color: {loading? "loading" : `${color.colorName}`}</p>
           <div className="flex gap-3">
             <div
               className="w-5 h-5 p-[2px] border border-black"
@@ -248,7 +249,7 @@ const ProductPage = () => {
                   </option>
                 ) : (
                   <>
-                    <option value="Select Size">Select Size</option>
+                    <option value={loading? "...loading" : "Select Size"}>{loading? "...loading" : "Select Size"}</option>
                     {product?.sizeOptions.map((opt) => (
                       <option
                         key={opt.id}
@@ -303,21 +304,21 @@ const ProductPage = () => {
                 />
               </div>
               <Button primary={false} action={ToggleRestockNotification}>
-               {restockLoading ? "...Loading" : "Notify Me"}
+                {restockLoading ? "...Loading" : "Notify Me"}
               </Button>
             </div>
           </div>
         )}
       </div>
 
-      {/* Modal */}
+
       {modal && (
         <div
           className="fixed top-0 left-0 w-full h-screen z-40 bg-black/25"
           onClick={() => setModal(false)}
         />
       )}
-      <Cart canScroll={true} modal={modal} setModal={setModal} value={1} />
+      <Cart canScroll={false} modal={modal} setModal={setModal} value={1} />
     </div>
   );
 };

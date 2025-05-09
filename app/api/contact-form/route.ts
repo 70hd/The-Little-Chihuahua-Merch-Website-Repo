@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
@@ -6,14 +6,17 @@ export async function POST(req: Request) {
     const body = await req.json();
 
     if (!body.name || !body.email || !body.comments) {
-      return new Response(JSON.stringify({ error: "Name, email, and comments are required." }), { status: 400 });
+      return new Response(
+        JSON.stringify({ error: "Name, email, and comments are required." }),
+        { status: 400 }
+      );
     }
 
     const updateForm = await prisma.contact.create({
       data: {
         name: body.name,
         email: body.email,
-        phoneNumber: body.phoneNumber || null,  // Optional, null if not provided
+        phoneNumber: body.phoneNumber || null,
         selectLocation: body.selectLocation || null,
         comments: body.comments,
       },
@@ -34,9 +37,7 @@ export async function POST(req: Request) {
         comments: body.comments,
       }),
     });
-    
-    console.log("Zapier response:", await zapRes.text());
-    
+
     if (!zapRes.ok) {
       console.error("Zapier request failed:", zapRes.status);
     }
@@ -44,6 +45,8 @@ export async function POST(req: Request) {
     return new Response(JSON.stringify(updateForm), { status: 200 });
   } catch (error) {
     console.error("Error submitting data:", error);
-    return new Response(JSON.stringify({ error: "Couldn't submit data" }), { status: 500 });
+    return new Response(JSON.stringify({ error: "Couldn't submit data" }), {
+      status: 500,
+    });
   }
 }

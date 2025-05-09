@@ -6,14 +6,12 @@ import { CldImage } from "next-cloudinary";
 type Product = {
   id: number;
   title: string;
-  image: { id: number; productId: number; image: string, alt: string }[];
-  // imageAlt: string;
+  image: { id: number; productId: number; image: string; alt: string }[];
   price: number;
   quantity: number;
   size: string;
   color: string;
-  alt: string,
-  colorName: string
+  colorName: string;
 };
 
 type CartProductCardProps = {
@@ -22,18 +20,22 @@ type CartProductCardProps = {
   onUpdateQuantity: (quantity: number) => void;
 };
 
-const CartProductCard = ({ product, onRemove,onUpdateQuantity }: CartProductCardProps) => {
- const [hover,setHover] = useState(false)
+const CartProductCard = ({
+  product,
+  onRemove,
+  onUpdateQuantity,
+}: CartProductCardProps) => {
+  const [hover, setHover] = useState(false);
   const [quantity, setQuantity] = useState(product.quantity);
   useEffect(() => {
-    onUpdateQuantity(quantity)
-  },[quantity])
+    onUpdateQuantity(quantity);
+  }, [quantity]);
   useEffect(() => {
     setQuantity(product.quantity);
   }, [product.quantity]);
-  const dynamicImage = hover? 1 : 0
-  if(!product){
-      return <div className="min-w-[285px] w-full h-[392px] full loader"/>
+  const dynamicImage = hover ? 1 : 0;
+  if (!product) {
+    return <div className="min-w-[285px] w-full h-[392px] full loader" />;
   }
   return (
     <article className="lg:w-fit w-fit h-fit flex gap-3 md:gap-9 md:flex-row flex-col ">
@@ -46,6 +48,7 @@ const CartProductCard = ({ product, onRemove,onUpdateQuantity }: CartProductCard
         priority
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
+         loading="lazy"
       />
       <div className="w-full  h-fit   flex flex-col sm:justify-between p-3">
         <div className="w-full h-fit flex gap-3 justify-between items-start ">
@@ -72,7 +75,7 @@ const CartProductCard = ({ product, onRemove,onUpdateQuantity }: CartProductCard
           </button>
         </div>
         <div className="w-full h-fit flex flex-col gap-[6px]">
-       <h5>${product.price}</h5>
+          <h5>${product.price}</h5>
           <Quantity number={quantity} setNumber={setQuantity} />
         </div>
       </div>

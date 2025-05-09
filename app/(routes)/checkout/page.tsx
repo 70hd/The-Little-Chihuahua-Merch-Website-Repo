@@ -5,21 +5,25 @@ import PaymentDetails from "@/components/payment-details";
 import { useCart } from "@/context/cart-context";
 import React, { useState } from "react";
 
-const Checkout = () => {
-  type PriceState = {
-    subtotal: number;
-    estimatedTaxes: number;
-    estimatedOrderTotal: number;
-  };
+type PriceState = {
+  subtotal: number;
+  estimatedTaxes: number;
+  estimatedOrderTotal: number;
+};
+
+const Checkout: React.FC = () => {
   const [price, setPrice] = useState<PriceState>({
     subtotal: 0,
     estimatedTaxes: 0,
     estimatedOrderTotal: 0,
   });
+
   const { cartItems } = useCart();
-  if(cartItems.length === 0){
-    return <NotFound checkout={true}/>
+
+  if (cartItems.length === 0) {
+    return <NotFound checkout={true} />;
   }
+
   return (
     <div className="flex gap-[30px] lg:flex-row flex-col dynamic-x-padding mt-24">
       <div className="w-fit h-fit pb-12">

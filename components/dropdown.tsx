@@ -45,20 +45,20 @@ const Dropdown = ({
   };
   if (!Array.isArray(products)) return null;
   return (
-    <div className="w-fit h-fit bg-white z-10 relative md:min-w-[192px] flex items-center justify-end">
+    <div className="w-fit h-fit  z-10 relative items-start min-w-[225px] flex  lg:justify-end">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="cursor-pointer flex gap-3 items-center"
+        className="cursor-pointer flex gap-3 items-center w-fit"
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-label="Sort products dropdown"
       >
-        <p className="text-center">Sort: {currentFilter}</p>
+        <p className="text-center ">Sort: {currentFilter}</p>
         <AnimatedArrow isOpen={isOpen} />
       </button>
 
       <div
-        className={`transition-all duration-200 ease-in-out  top-6 absolute  w-full bg-white ${
+        className={`transition-all duration-200 ease-in-out  top-6 absolute  w-fit bg-white ${
           isOpen ? "opacity-100" : "opacity-0"
         }`}
       >
@@ -69,7 +69,7 @@ const Dropdown = ({
               <li key={index} role="menuitem">
                 <button
                   onClick={() => handleSort(item)}
-                  className="cursor-pointer w-full text-left p-2"
+                  className="cursor-pointer w-fit text-left p-2"
                 >
                   {item}
                 </button>

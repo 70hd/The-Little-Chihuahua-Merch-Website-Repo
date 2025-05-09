@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 type PriceOption = {
   price: number;
@@ -19,11 +19,15 @@ type Product = {
   colorName: string;
   status: string;
   inventory: number;
-  priceOptions: PriceOption[]; // Updated type
-  sizeOptions: SizeOption[]; // Updated type
+  priceOptions: PriceOption[]; 
+  sizeOptions: SizeOption[]; 
 };
 
-export const useGetProducts = (): [boolean, Product[] | null, string | null] => {
+export const useGetProducts = (): [
+  boolean,
+  Product[] | null,
+  string | null
+] => {
   const [loading, setLoading] = useState<boolean>(true);
   const [products, setProducts] = useState<Product[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -31,17 +35,16 @@ export const useGetProducts = (): [boolean, Product[] | null, string | null] => 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch('/api/get-products');
+        const response = await fetch("/api/get-products");
         const data = await response.json();
-        
-        console.log(data)
+
         if (response.ok) {
           setProducts(data);
         } else {
-          setError(data.error || 'An error occurred');
+          setError(data.error || "An error occurred");
         }
       } catch (err) {
-        setError('Failed to fetch products');
+        setError("Failed to fetch products");
       } finally {
         setLoading(false);
       }

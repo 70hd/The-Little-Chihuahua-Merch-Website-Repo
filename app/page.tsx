@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-// import type { ProductType } from "@/types/product";
 import PickupLocation from "@/components/pickup-location";
 import Dropdown from "@/components/dropdown";
 import Product from "@/components/product";
@@ -12,13 +11,9 @@ interface PriceOption {
 }
 
 interface SizeOption {
-  id?: number; // make optional
+  id?: number;
   size: string;
   status?: string;
-}
-interface Errors {
-  email: string;
-  size: string;
 }
 
 interface ProductType {
@@ -28,7 +23,7 @@ interface ProductType {
   colorName: string;
   colorHex: string;
   priceOptions: PriceOption[];
-  sizeOptions: SizeOption[]; // sizeOptions now works with the optional 'id'
+  sizeOptions: SizeOption[];
   status: string;
   images: { image: string; alt: string; id: number }[];
 }
@@ -37,8 +32,6 @@ export default function Home() {
   const [loading, products, error] = useGetProducts();
 
   useEffect(() => {
-    console.log(products);
-    // Ensure products is an array and not null or undefined
     setFinalProducts(Array.isArray(products) ? products : []);
   }, [loading, products, error]);
 
@@ -48,12 +41,12 @@ export default function Home() {
         className="w-full  h-[392px] bg-[url('/images/hero.png')]  text-white bg-no-repeat bg-cover z-0 dynamic-x-padding dynamic-24-y-padding bg-top flex flex-1 flex-col relative"
         aria-label="Hero banner"
       >
-        <h1>
-          Your pick. <br /> It's free.
+        <h1 className="text-4xl font-bold leading-tight">
+          The Little Chihuahua <br /> Official Merch
         </h1>
-        <p className="w-full max-w-[392px]">
-          Join Taco Bell Rewards to get a free Cantina Chicken Crispy Taco,
-          Beefy 5-Layer Burrito, or Soft Taco.
+        <p className="w-full max-w-[392px] text-lg mt-2">
+          Gear from the taqueria you love — for you, your friends, and your
+          furry friends.
         </p>
       </section>
 
@@ -61,7 +54,7 @@ export default function Home() {
         className="flex flex-col gap-[30px]  md:py-12 dynamic-x-padding w-full"
         aria-label="Product and location section"
       >
-        <div className="flex flex-wrap gap-3 w-full h-fit justify-between items-center">
+        <div className="flex flex-wrap gap-6 w-full h-fit justify-between items-center">
           <PickupLocation />
           <Dropdown
             setProducts={setFinalProducts}

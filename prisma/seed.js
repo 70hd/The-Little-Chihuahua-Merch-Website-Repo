@@ -64,11 +64,10 @@ async function main() {
 
     const createdProducts = [];
 
-
     for (const data of productData) {
       const product = await prisma.product.upsert({
-        where: { title: data.title }, // Use title to check for existing product
-        update: {}, // No need to update anything if it already exists
+        where: { title: data.title },
+        update: {},
         create: {
           title: data.title,
           description: data.description,
@@ -76,16 +75,13 @@ async function main() {
           colorName: data.colorName,
           status: data.status,
           inventory: data.inventory,
-          id: data.id
-          // No need to provide 'id'; let Prisma handle it as an auto-increment field
+          id: data.id,
         },
       });
-    
-      createdProducts.push(product); // Store created product for future reference
+
+      createdProducts.push(product);
     }
-    
-    // Continue with the rest of your logic for creating related images, sizes, etc.
-    // Continue with the rest of your logic for creating related images, sizes, etc.
+
     await prisma.image.deleteMany();
     const images = await prisma.image.createMany({
       data: [
@@ -257,33 +253,158 @@ async function main() {
             "https://res.cloudinary.com/da8kkevrh/image/upload/w_1000,ar_1:1,c_fill,g_auto,e_art:hokusai/v1746577351/2023_TLC_Product_69-min_vgjwon.jpg",
           alt: "Model smiling and posing outside in charcoal TLC Printed Hoodie",
         },
-        
       ],
     });
 
     const sizes = await prisma.size.createMany({
       data: [
-        { id: 1, productId: createdProducts[0].id, size: "Xtra Small", inventory: 1, status: "AVAILABLE" },
-        { id: 2, productId: createdProducts[0].id, size: "Small", inventory: 1, status: "AVAILABLE" },
-        { id: 3, productId: createdProducts[0].id, size: "Medium", inventory: 1, status: "AVAILABLE" },
-        { id: 4, productId: createdProducts[0].id, size: "Large", inventory: 1, status: "AVAILABLE" },
-        { id: 5, productId: createdProducts[0].id, size: "Xtra Large", inventory: 1, status: "AVAILABLE" },
-        { id: 6, productId: createdProducts[1].id, size: "Small (3-6lbs)", inventory: 1, status: "AVAILABLE" },
-        { id: 7, productId: createdProducts[1].id, size: "Medium (6-10lbs)", inventory: 1, status: "AVAILABLE" },
-        { id: 8, productId: createdProducts[1].id, size: "Large (10-14lbs)", inventory: 1, status: "AVAILABLE" },
-        { id: 9, productId: createdProducts[1].id, size: "XLarge (14-20lbs)", inventory: 1, status: "AVAILABLE" },
-        { id: 10, productId: createdProducts[1].id, size: "XXX Large (25-35lbs)", inventory: 1, status: "AVAILABLE" },
-        { id: 11, productId: createdProducts[1].id, size: "5XL (45-60Lbs)", inventory: 1, status: "AVAILABLE" },
-        { id: 12, productId: createdProducts[2].id, size: "One Size Fits Most", inventory: 1, status: "AVAILABLE" },
-        { id: 13, productId: createdProducts[3].id, size: "Adjustable", inventory: 1, status: "AVAILABLE" },
-        { id: 14, productId: createdProducts[4].id, size: "Small", inventory: 1, status: "AVAILABLE" },
-        { id: 15, productId: createdProducts[4].id, size: "Medium", inventory: 1, status: "AVAILABLE" },
-        { id: 16, productId: createdProducts[4].id, size: "Large", inventory: 1, status: "AVAILABLE" },
-        { id: 17, productId: createdProducts[4].id, size: "Xtra Large", inventory: 1, status: "AVAILABLE" },
-        { id: 18, productId: createdProducts[5].id, size: "Small", inventory: 1, status: "AVAILABLE" },
-        { id: 19, productId: createdProducts[5].id, size: "Medium", inventory: 1, status: "AVAILABLE" },
-        { id: 20, productId: createdProducts[5].id, size: "Large", inventory: 1, status: "AVAILABLE" },
-        { id: 21, productId: createdProducts[5].id, size: "Xtra Large", inventory: 1, status: "AVAILABLE" },
+        {
+          id: 1,
+          productId: createdProducts[0].id,
+          size: "Xtra Small",
+          inventory: 1,
+          status: "AVAILABLE",
+        },
+        {
+          id: 2,
+          productId: createdProducts[0].id,
+          size: "Small",
+          inventory: 1,
+          status: "AVAILABLE",
+        },
+        {
+          id: 3,
+          productId: createdProducts[0].id,
+          size: "Medium",
+          inventory: 1,
+          status: "AVAILABLE",
+        },
+        {
+          id: 4,
+          productId: createdProducts[0].id,
+          size: "Large",
+          inventory: 1,
+          status: "AVAILABLE",
+        },
+        {
+          id: 5,
+          productId: createdProducts[0].id,
+          size: "Xtra Large",
+          inventory: 1,
+          status: "AVAILABLE",
+        },
+        {
+          id: 6,
+          productId: createdProducts[1].id,
+          size: "Small (3-6lbs)",
+          inventory: 1,
+          status: "AVAILABLE",
+        },
+        {
+          id: 7,
+          productId: createdProducts[1].id,
+          size: "Medium (6-10lbs)",
+          inventory: 1,
+          status: "AVAILABLE",
+        },
+        {
+          id: 8,
+          productId: createdProducts[1].id,
+          size: "Large (10-14lbs)",
+          inventory: 1,
+          status: "AVAILABLE",
+        },
+        {
+          id: 9,
+          productId: createdProducts[1].id,
+          size: "XLarge (14-20lbs)",
+          inventory: 1,
+          status: "AVAILABLE",
+        },
+        {
+          id: 10,
+          productId: createdProducts[1].id,
+          size: "XXX Large (25-35lbs)",
+          inventory: 1,
+          status: "AVAILABLE",
+        },
+        {
+          id: 11,
+          productId: createdProducts[1].id,
+          size: "5XL (45-60Lbs)",
+          inventory: 1,
+          status: "AVAILABLE",
+        },
+        {
+          id: 12,
+          productId: createdProducts[2].id,
+          size: "One Size Fits Most",
+          inventory: 1,
+          status: "AVAILABLE",
+        },
+        {
+          id: 13,
+          productId: createdProducts[3].id,
+          size: "Adjustable",
+          inventory: 1,
+          status: "AVAILABLE",
+        },
+        {
+          id: 14,
+          productId: createdProducts[4].id,
+          size: "Small",
+          inventory: 1,
+          status: "AVAILABLE",
+        },
+        {
+          id: 15,
+          productId: createdProducts[4].id,
+          size: "Medium",
+          inventory: 1,
+          status: "AVAILABLE",
+        },
+        {
+          id: 16,
+          productId: createdProducts[4].id,
+          size: "Large",
+          inventory: 1,
+          status: "AVAILABLE",
+        },
+        {
+          id: 17,
+          productId: createdProducts[4].id,
+          size: "Xtra Large",
+          inventory: 1,
+          status: "AVAILABLE",
+        },
+        {
+          id: 18,
+          productId: createdProducts[5].id,
+          size: "Small",
+          inventory: 1,
+          status: "AVAILABLE",
+        },
+        {
+          id: 19,
+          productId: createdProducts[5].id,
+          size: "Medium",
+          inventory: 1,
+          status: "AVAILABLE",
+        },
+        {
+          id: 20,
+          productId: createdProducts[5].id,
+          size: "Large",
+          inventory: 1,
+          status: "AVAILABLE",
+        },
+        {
+          id: 21,
+          productId: createdProducts[5].id,
+          size: "Xtra Large",
+          inventory: 1,
+          status: "AVAILABLE",
+        },
       ],
     });
 

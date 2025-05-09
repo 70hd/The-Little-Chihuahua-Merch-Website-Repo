@@ -53,15 +53,10 @@ const Contact = () => {
 
     if (Object.keys(newErrors).length) {
       setLoading(false);
-      return; // Prevents submission if there are errors
+      return; 
     }
 
     try {
-      console.log(
-        JSON.stringify(
-          Object.fromEntries(fields.map(({ name, value }) => [name, value]))
-        )
-      );
       const formData = Object.fromEntries(
         fields.map(({ name, value }) => [
           name,
@@ -116,7 +111,9 @@ const Contact = () => {
   return (
     <div className="dynamic-x-padding my-24">
       <div className="w-full flex flex-col gap-6">
-        <h1 className="text-[#16767E]">Contact</h1>
+        <h1 className="text-[#16767E]" tabIndex={0}>
+          Contact
+        </h1>
         <h5>
           If your matter is urgent, please call the restaurant, otherwise we
           will get back to you in 24 hours. Thanks!
@@ -135,6 +132,7 @@ const Contact = () => {
                 <label
                   htmlFor={id}
                   className="text-[1rem] text-black/75 font-medium"
+                  id={`label-${field.name}`}
                 >
                   {formatLabel(field.name)}
                   {field.required && <span className="text-[#CD3626]"> *</span>}
@@ -156,6 +154,7 @@ const Contact = () => {
                       className={`border-[.5px] text-[1.1rem] border-black/75 p-3 pr-10 rounded w-full max-w-[606px] appearance-none focus:outline-none focus:ring-0 ${
                         !field.value ? "text-black/40" : "text-black"
                       }`}
+                      aria-labelledby={`label-${field.name}`}
                     >
                       <option value="">{formatLabel(field.name)}</option>
                       {field.options.map((opt, idx) => (
@@ -173,6 +172,7 @@ const Contact = () => {
                     onChange={(e) => handleChange(e, index)}
                     placeholder={formatLabel(field.name)}
                     className="border-[.5px] text-[1.1rem] text-black/75 border-black/75 p-3 pr-10 rounded appearance-none focus:outline-none focus:ring-0 h-[192px] w-full"
+                    aria-labelledby={`label-${field.name}`}
                   />
                 ) : (
                   <Input
@@ -181,6 +181,7 @@ const Contact = () => {
                     value={field.value}
                     action={(e) => handleChange(e, index)}
                     placeholder={formatLabel(field.name)}
+                    aria-labelledby={`label-${field.name}`}
                   />
                 )}
                 <ErrorText text={errors[field.name]} />
@@ -189,8 +190,8 @@ const Contact = () => {
           })}
         </div>
         <div>
-          <Button primary={false} action={ handleSubmit}>
-            {loading ? "...Submiting" : "Submit"}
+          <Button primary={false} action={handleSubmit} aria-live="assertive">
+            {loading ? "...Submitting" : "Submit"}
           </Button>
         </div>
       </div>

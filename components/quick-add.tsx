@@ -60,7 +60,6 @@ const QuickAdd = ({
 
     const selectedPrice = product.priceOptions?.[priceIndex]?.price ?? 0;
 
-
     addToCart({
       id: product.id,
       title: product.title,
@@ -68,8 +67,7 @@ const QuickAdd = ({
       color: product.colorName,
       size: selectedSize,
       quantity: 1,
-      image: product.images, // Adjust based on actual product property
-      imageAlt: "", // Optional: fill with alt text
+      image: product.images,
     });
 
     setShowSizeOptions(false);
@@ -120,7 +118,7 @@ const QuickAdd = ({
           {size.map((item, index) => {
             const product = products?.find((p) => p.id === item.productId);
             const isOutOfStock = product?.status === "OUT_OF_STOCK";
-            const isSizeOutOfStock = item?.status=== "OUT_OF_STOCK";
+            const isSizeOutOfStock = item?.status === "OUT_OF_STOCK";
             return (
               <div
                 key={index}

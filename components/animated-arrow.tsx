@@ -1,5 +1,5 @@
-import React from 'react'
-import { motion } from 'framer-motion'
+import React from "react";
+import { motion } from "framer-motion";
 
 const AnimatedArrow = ({ isOpen }: { isOpen: boolean }) => {
   return (
@@ -11,7 +11,7 @@ const AnimatedArrow = ({ isOpen }: { isOpen: boolean }) => {
       animate={{ rotate: isOpen ? 90 : 0 }}
       transition={{ duration: 0.3 }}
     />
-  )
-}
+  );
+};
 
-export default AnimatedArrow
+export default AnimatedArrow;

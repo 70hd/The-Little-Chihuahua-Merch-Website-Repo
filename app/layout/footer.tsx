@@ -5,7 +5,7 @@ import React from "react";
 const Footer = () => {
   const locations = [
     {
-        name: "Polk Street",
+      name: "Polk Street",
       location: "1431 Polk St.",
       zipCode: "San Francisco, CA 94117",
       phoneNumber: "415.796.3600",
@@ -17,14 +17,14 @@ const Footer = () => {
       ],
     },
     {
-        name: "Noe Valley",
+      name: "Noe Valley",
       location: "4123 24th St.",
       zipCode: "San Francisco, CA 94117",
       phoneNumber: "415.648.4157",
       hours: ["11am - 8:30pm (Mon-Fri)", "10am - 8:30pm (Sat-Sun)"],
     },
     {
-        name: "Lower Haight",
+      name: "Lower Haight",
       location: "292 Divisidero St.",
       zipCode: "San Francisco, CA 94117",
       phoneNumber: "415.255.8225",
@@ -37,13 +37,17 @@ const Footer = () => {
       <div className="w-full h-fit flex flex-col gap-[24px] dynamic-x-padding py-9 bg-[#16767E] items-center justify-center text-white">
         <div className="w-fit h-fit flex flex-col text-center">
           <h5>The Little Chihuahua</h5>
-          <p>Three San Francisco locations to serve you
-          </p>
+          <p>Three San Francisco locations to serve you</p>
         </div>
-        <Button primary={true} link="" isFooter={true}>ORDER ONLINE</Button>
+        <Button primary={true} link="https://www.thelittlechihuahua.com/" isFooter={true}>
+          ORDER FOOD ONLINE
+        </Button>
         <div className="w-full flex md:flex-row flex-col gap-[30px] items-start justify-center">
           {locations.map((info, i) => (
-            <address className="w-full not-italic text-center h-fit flex flex-col px-[15px] pb-6" key={i}>
+            <address
+              className="w-full not-italic text-center h-fit flex flex-col px-[15px] pb-6"
+              key={i}
+            >
               <h2 className="pt-4 pb-1">{info.name}</h2>
               {[info.location, info.zipCode, info.phoneNumber].map(
                 (info, i) => (
@@ -58,22 +62,22 @@ const Footer = () => {
         </div>
       </div>
       <section className="w-full items-center flex flex-col mt-3 bg-white">
-          <p>© 2025 All Rights Reserved.</p>
-          <p>www.thelittlechihuahua.com</p>
+        <p>© 2025 All Rights Reserved.</p>
+        <p>www.thelittlechihuahua.com</p>
 
         <div className="flex gap-[6px] pt-2 pb-3">
-            {/* add "/icons/facebook" */}
-          {[ "/icons/instagram.svg", "/icons/twitter.svg"].map(
-            (icon, i) => (
-              <Image
-                key={i}
-                src={icon}
-                width={53}
-                height={53}
-                alt={`${icon.split("/").pop()?.replace(".svg", "")} social media icon`}
-              />
-            )
-          )}
+          {["/icons/facebook.svg","/icons/instagram.svg", "/icons/twitter.svg"].map((icon, i) => (
+            <Image
+              key={i}
+              src={icon}
+              width={53}
+              height={53}
+              alt={`${icon
+                .split("/")
+                .pop()
+                ?.replace(".svg", "")} social media icon`}
+            />
+          ))}
         </div>
       </section>
     </footer>

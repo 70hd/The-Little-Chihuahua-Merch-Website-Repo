@@ -18,7 +18,16 @@ const Quantity = ({ number, setNumber }: ToggleSumChangeProps) => {
     label: string;
   };
   const UpdateSum = ({ src, onClick, label }: UpdateSumProps) => (
-    <button type="button" onClick={onClick} aria-label={label} className={`${number === 1 && src.toLowerCase().includes("minus") ? "cursor-not-allowed": "cursor-pointer"}`}>
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      className={`${
+        number === 1 && src.toLowerCase().includes("minus")
+          ? "cursor-not-allowed"
+          : "cursor-pointer"
+      }`}
+    >
       <Image
         src={src}
         width={20}
