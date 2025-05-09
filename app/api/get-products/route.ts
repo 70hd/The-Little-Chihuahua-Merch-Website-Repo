@@ -14,8 +14,18 @@ export async function GET() {
       data: {
         status: "LOW_STOCK",
       },
+      
     });
-
+    await prisma.product.updateMany({
+      where: {
+        inventory: {
+          gt: 10,
+        },
+      },
+      data: {
+        status: "AVAILABLE",
+      },
+    });
     await prisma.product.updateMany({
       where: {
         inventory: 0,
