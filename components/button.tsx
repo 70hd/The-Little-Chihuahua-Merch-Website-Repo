@@ -8,6 +8,7 @@ type ButtonProps = {
   disabled?: boolean;
   isFooter?: boolean;
   primary?: boolean;
+  type?: string;
 };
 
 const Button = ({
@@ -17,10 +18,11 @@ const Button = ({
   disabled = false,
   isFooter,
   primary,
+  type = "button"
 }: ButtonProps) => {
   const button = (
     <button
-      type="button"
+      type={type === "submit"? "submit": "button"}
       onClick={action}
       disabled={disabled}
       aria-label={typeof children === `string` ? children : "Primary button"}

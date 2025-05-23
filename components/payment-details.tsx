@@ -10,16 +10,19 @@ type PriceState = {
   subtotal: number;
   estimatedTaxes: number;
   estimatedOrderTotal: number;
+  shippingFee: number
+  setStatus: React.Dispatch<React.SetStateAction<string>>;
 };
 
 const PaymentDetails = ({
+  setStatus,
   subtotal,
   estimatedTaxes,
   estimatedOrderTotal,
+  shippingFee
 }: PriceState) => {
   const { location, time, ship, setPickupDetails } = useContext(PickupContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const shippingFee = 10;
   const isShippingFee = ship && { title: "Shipping Fee", amount: shippingFee };
 
   const pricingDetails = [
@@ -28,7 +31,7 @@ const PaymentDetails = ({
     { ...isShippingFee },
     {
       title: "Estimated Order Total",
-      amount: ship ? estimatedOrderTotal + shippingFee : estimatedOrderTotal,
+      amount: estimatedOrderTotal,
     },
   ];
 
@@ -119,7 +122,7 @@ const PaymentDetails = ({
       </div>
 
       <div>
-        <Button primary={true}>Continue to Payment</Button>
+        <Button primary={true} action={() => setStatus("CHECKOUT")}>Continue to Payment</Button>
       </div>
     </section>
   );

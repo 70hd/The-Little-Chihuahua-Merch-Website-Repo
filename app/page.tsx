@@ -45,8 +45,8 @@ export default function Home() {
           The Little Chihuahua <br /> Official Merch
         </h1>
         <p className="w-full max-w-[392px] text-lg mt-2">
-          Gear from the taqueria you love — for you, your friends, and your
-          furry friends.
+          Gear from the taqueria you love — for you,
+          <br /> your friends, and your furry friends.
         </p>
       </section>
 

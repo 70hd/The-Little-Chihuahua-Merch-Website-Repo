@@ -1,6 +1,7 @@
 import { useCart } from "@/context/cart-context";
+import { PickupContext } from "../context/pickup-context";
 import Image from "next/image";
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import CartProductCard from "./cart-product-card";
 import Button from "./button";
 
@@ -17,6 +18,7 @@ type PriceState = {
   subtotal: number;
   estimatedTaxes: number;
   estimatedOrderTotal: number;
+  shippingFee: number;
 };
 interface CartDisplayProps {
   button: boolean;
@@ -30,6 +32,7 @@ const CartDisplay: React.FC<CartDisplayProps> = ({
   checkout,
 }) => {
   const { cartItems, removeFromCart, updateQuantity } = useCart();
+    const { time,ship } = useContext(PickupContext);
 
   const getSafePrice = (price: number | { price: number }): number => {
     if (typeof price === "number") return price;
@@ -46,14 +49,16 @@ const CartDisplay: React.FC<CartDisplayProps> = ({
 
     const taxRate = 0.08625;
     const estimatedTaxes = Math.round(subtotal * taxRate);
-    const estimatedOrderTotal = Math.round(subtotal + estimatedTaxes);
-
+    const shippingFee = ship ? 10 : 0
+    const estimatedOrderTotal = Math.round(subtotal + shippingFee + estimatedTaxes);
+console.log({ship:shippingFee})
     setPrice({
       subtotal,
       estimatedTaxes,
       estimatedOrderTotal,
+      shippingFee,
     });
-  }, [cartItems, setPrice]);
+  }, [cartItems, setPrice,ship]);
   return (
     <div className="h-fit w-full lg:w-fit flex flex-col gap-9">
       <header className="w-full bg-white py-3 flex justify-between sticky z-50 border-b border-black/25 top-0">

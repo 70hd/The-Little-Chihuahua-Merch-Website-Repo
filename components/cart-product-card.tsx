@@ -2,6 +2,7 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import Quantity from "./quantity";
 import { CldImage } from "next-cloudinary";
+import Link from "next/link";
 
 type Product = {
   id: number;
@@ -39,6 +40,7 @@ const CartProductCard = ({
   }
   return (
     <article className="lg:w-fit w-fit h-fit flex gap-3 md:gap-9 md:flex-row flex-col ">
+      <Link href={`/product/${product.title}`}>
       <CldImage
         src={product?.image[dynamicImage]?.image}
         alt={product?.image[dynamicImage]?.alt}
@@ -49,15 +51,16 @@ const CartProductCard = ({
         onMouseLeave={() => setHover(false)}
          loading="lazy"
       />
-      <div className="w-full  h-fit   flex flex-col sm:justify-between p-3">
-        <div className="w-full h-fit flex gap-3 justify-between items-start ">
-          <div className="flex  w-full flex-col gap-[6px]">
+      </Link>
+      <div className="w-full  h-full   flex flex-col md:justify-between p-3">
+        <div className="w-full h-fit  flex gap-3 justify-between items-start ">
+          <Link href={`/product/${product.title}`} className="flex  w-full flex-col gap-[6px]">
             <h2 className="w-full">{product.title}</h2>
             <p className="text-black/50">
               {product.size.toUpperCase()} |{" "}
               {product?.colorName?.toLocaleUpperCase()}
             </p>
-          </div>
+          </Link>
           <button
             aria-label="Remove product from cart"
             onClick={() => onRemove(product.id)}

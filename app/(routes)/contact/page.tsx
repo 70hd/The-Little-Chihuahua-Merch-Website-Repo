@@ -88,7 +88,7 @@ const Contact = () => {
 
   if (submitted) {
     return (
-      <div className="dynamic-x-padding pt-[12px] pb-42 w-full flex flex-col gap-6 my-24">
+      <main className="dynamic-x-padding pt-[12px] pb-42 w-full flex flex-col gap-6 my-24">
         <header>
           <h1 className="text-[#16767E] mb-[1.5rem]" tabIndex={0}>
             Thank You
@@ -104,12 +104,12 @@ const Contact = () => {
             will get back to you in 24 hours. Thanks!
           </h5>
         </section>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="dynamic-x-padding my-24">
+    <main className="dynamic-x-padding my-24">
       <div className="w-full flex flex-col gap-6">
         <h1 className="text-[#16767E]" tabIndex={0}>
           Contact
@@ -195,7 +195,7 @@ const Contact = () => {
           </Button>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 

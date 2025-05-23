@@ -1,15 +1,80 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../lib/generated/prisma"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model Contact {
+  id             Int     @id @default(autoincrement())
+  name           String
+  email          String
+  phoneNumber    String?
+  selectLocation String?
+  comments       String
+}
+
+model Image {
+  id        Int    @id @default(autoincrement())
+  image     String
+  productId Int
+  alt       String
+}
+
+model Prices {
+  id        Int @id @default(autoincrement())
+  price     Int
+  productId Int
+}
+
+model Product {
+  id          Int             @id @default(autoincrement())
+  title       String          @unique
+  description String
+  colorHex    String
+  colorName   String
+  status      Product_status?
+  inventory   Int
+}
+
+model RestockNotification {
+  id        Int    @id @default(autoincrement())
+  email     String
+  productId Int
+}
+
+model Size {
+  id        Int          @id @default(autoincrement())
+  size      String
+  productId Int
+  inventory Int
+  status    Size_status?
+}
+
+model Order {
+  id         Int      @id @default(autoincrement())
+  orderId    String
+  sessionId  String
+  email      String?
+  amount     Int?
+  createdAt  DateTime @default(now())
+  ship       Boolean?
+  location   String?  @db.VarChar(255)
+  pickupTime String?  @db.VarChar(255)
+
+  @@map("orders")
+}
+
+enum Size_status {
+  AVAILABLE
+  LOW_STOCK
+  OUT_OF_STOCK
+}
+
+enum Product_status {
+  AVAILABLE
+  LOW_STOCK
+  OUT_OF_STOCK
 }
