@@ -14,6 +14,7 @@ export const config = {
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-04-30.basil',
 });
+const zapierUrl = process.env.ZAPIER_ORDER_WEBHOOK_URL;
 
 async function buffer(readable: Readable) {
   const chunks = [];
@@ -98,19 +99,23 @@ export async function POST(req: NextRequest) {
         });
       }
       try {
-        await fetch('https://hooks.zapier.com/hooks/catch/22705783/2j1wwdu/', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            orderId,
-            sessionId: session.id,
-            email: session.customer_email || "no-email",
-            amount: session.amount_total || 0,
-            ship: ship || null,
-            location: location || null,
-            pickupTime: time || null
-          }),
-        });
+        if (!zapierUrl) {
+          console.error("Missing ZAPIER_ORDER_WEBHOOK_URL environment variable.");
+        } else {
+          await fetch(zapierUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              orderId,
+              sessionId: session.id,
+              email: session.customer_email || "no-email",
+              amount: session.amount_total || 0,
+              ship: ship || null,
+              location: location || null,
+              pickupTime: time || null
+            }),
+          });
+        }
       } catch (zapError) {
         console.error(`Failed to notify users for product`, zapError);
       }
