@@ -60,6 +60,9 @@ const Checkout: React.FC = () => {
           <Image src="/icons/right-arrow.svg" width={20} height={20} alt="right arrow" />
         </button>
         <h1>Checkout</h1>
+          <p>
+                  "<span className="text-[#CD3626]">*</span>" indicates required fields
+                </p>
       </header>
         {/* <CheckoutPage amount={price.estimatedOrderTotal + price.shippingFee}/> */}
         <CheckoutPage amount={1}/>

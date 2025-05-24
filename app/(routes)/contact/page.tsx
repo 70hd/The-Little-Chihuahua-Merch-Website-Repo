@@ -53,7 +53,7 @@ const Contact = () => {
 
     if (Object.keys(newErrors).length) {
       setLoading(false);
-      return; 
+      return;
     }
 
     try {
@@ -182,6 +182,7 @@ const Contact = () => {
                     action={(e) => handleChange(e, index)}
                     placeholder={formatLabel(field.name)}
                     aria-labelledby={`label-${field.name}`}
+                    required={true}
                   />
                 )}
                 <ErrorText text={errors[field.name]} />

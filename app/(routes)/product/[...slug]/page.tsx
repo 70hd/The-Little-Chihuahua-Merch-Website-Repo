@@ -301,6 +301,7 @@ const ProductPage = () => {
                   value={restockNotification}
                   action={(e) => HandleRestockNotificationChange(e)}
                   placeholder="Email"
+                  required={true}
                 />
               </div>
               <Button primary={false} action={ToggleRestockNotification}>

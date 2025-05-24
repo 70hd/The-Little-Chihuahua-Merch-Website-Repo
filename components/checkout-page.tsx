@@ -42,7 +42,7 @@ export default function CheckoutPage({ amount }: { amount: number }) {
             currency: "usd",
           }}
         >
-          <CheckoutPageFunc amount={amount} />
+          <CheckoutPageFunc amount={amount}  />
         </Elements>
       )}
     </main>

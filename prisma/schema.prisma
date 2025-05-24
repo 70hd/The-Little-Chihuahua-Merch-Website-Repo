@@ -54,15 +54,23 @@ model Size {
 }
 
 model Order {
-  id         Int      @id @default(autoincrement())
-  orderId    String
-  sessionId  String
-  email      String?
-  amount     Int?
-  createdAt  DateTime @default(now())
-  ship       Boolean?
-  location   String?  @db.VarChar(255)
-  pickupTime String?  @db.VarChar(255)
+  id          Int      @id @default(autoincrement())
+  orderId     String
+  sessionId   String
+  email       String?
+  amount      Int?
+  createdAt   DateTime @default(now())
+  ship        Boolean?
+  location    String?  @db.VarChar(255)
+  pickupTime  String?  @db.VarChar(255)
+  firstName   String?  @db.VarChar(255)
+  lastName    String?  @db.VarChar(255)
+  country     String?  @db.VarChar(255)
+  address     String?  @db.VarChar(255)
+  unitDetails String?  @db.VarChar(255)
+  city        String?  @db.VarChar(255)
+  state       String?  @db.VarChar(255)
+  postalCode  String?  @db.VarChar(255)
 
   @@map("orders")
 }
