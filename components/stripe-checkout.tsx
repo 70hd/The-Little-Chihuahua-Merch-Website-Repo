@@ -142,6 +142,7 @@ const CheckoutPageFunc = ({ amount }: { amount: number }) => {
       confirmParams: { return_url: window.location.origin },
       redirect: "if_required",
     });
+    console.log("Confirmed payment intent:", paymentIntent);
 
     if (error) {
       setErrorMessage(error.message);

@@ -55,6 +55,7 @@ export async function POST(req: NextRequest) {
   if (event.type === 'payment_intent.succeeded') {
     const intent = event.data.object as Stripe.PaymentIntent;
     const orderId = `ORD-${Date.now()}`;
+    console.log("PaymentIntent metadata:", intent.metadata);
 
     const orderData = {
       orderId,
@@ -94,6 +95,6 @@ export async function POST(req: NextRequest) {
       await prisma.$disconnect();
     }
   }
-
+  console.log("Webhook triggered:", event.type);
   return new Response("Webhook received", { status: 200 });
 }

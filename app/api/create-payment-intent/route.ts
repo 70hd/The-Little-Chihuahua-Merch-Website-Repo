@@ -86,8 +86,8 @@ export async function POST(request: NextRequest) {
         postalCode,
         location,
         time,
-        ship,
-      },
+        ship: String(ship), // Convert to string explicitly
+      }
     });
 
     return NextResponse.json({
