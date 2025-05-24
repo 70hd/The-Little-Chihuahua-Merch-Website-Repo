@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   useStripe,
   useElements,
@@ -41,6 +41,9 @@ const CheckoutPageFunc = ({ amount }: { amount: number }) => {
   const [paymentIntentId, setPaymentIntentId] = useState("");
   const [errorMessage, setErrorMessage] = useState<string>();
   const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    console.log(shippingInfo)
+  },[shippingInfo])
 
   const handleChange = (key: keyof typeof initialShipping, value: string) =>
     setShippingInfo((prev) => ({ ...prev, [key]: value.trimStart() }));
@@ -106,7 +109,15 @@ const CheckoutPageFunc = ({ amount }: { amount: number }) => {
         body: JSON.stringify({
           amount: convertToSubcurrency(amount),
           email: userEmail.trim(),
-          ...shippingInfo,
+          // ...shippingInfo,
+          firstName: shippingInfo.firstName,
+          lastName: shippingInfo.lastName,
+          country: shippingInfo.country,
+          address: shippingInfo.address,
+          unitDetails: shippingInfo.unitDetails,
+          city: shippingInfo.city,
+          state: shippingInfo.state,
+          postalCode: shippingInfo.postalCode,
           location: location,
           time:time,
           ship: ship
