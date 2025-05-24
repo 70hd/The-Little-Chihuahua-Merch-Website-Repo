@@ -1,13 +1,6 @@
 import { NextRequest } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import Stripe from 'stripe';
-import { Readable } from 'stream';
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-04-30.basil',
@@ -15,11 +8,16 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 const zapierUrl = process.env.ZAPIER_ORDER_WEBHOOK_URL;
 
-async function buffer(readable: Readable) {
+async function buffer(readable: ReadableStream<Uint8Array>) {
+  const reader = readable.getReader();
   const chunks = [];
-  for await (const chunk of readable) {
-    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
   }
+
   return Buffer.concat(chunks);
 }
 
@@ -35,7 +33,12 @@ export async function POST(req: NextRequest) {
 
   let body: Buffer;
   try {
-    body = await buffer(req.body as any);
+    if (!req.body) {
+      console.error("Request body is null");
+      return new Response("Empty body", { status: 400 });
+    }
+    
+    body = await buffer(req.body);
   } catch (err) {
     console.error("Error reading Stripe body:", err);
     return new Response("Invalid body", { status: 400 });
@@ -52,7 +55,6 @@ export async function POST(req: NextRequest) {
   try {
     if (event.type === 'payment_intent.succeeded') {
       const intent = event.data.object as Stripe.PaymentIntent;
-
       const orderId = `ORD-${Date.now()}`;
       console.log("Creating order from payment intent:", { orderId, sessionId: intent.id, email: intent.receipt_email, amount: intent.amount });
 
@@ -71,8 +73,6 @@ export async function POST(req: NextRequest) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ orderId, sessionId: intent.id, email: intent.receipt_email || "no-email", amount: intent.amount || 0 }),
         });
-      } else {
-        console.error("ZAPIER_ORDER_WEBHOOK_URL is not set.");
       }
 
       console.log("Order successfully created from payment intent.");
@@ -80,7 +80,6 @@ export async function POST(req: NextRequest) {
 
     else if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
-
       const orderId = `ORD-${Date.now()}`;
       console.log("Creating order from checkout session:", { orderId, sessionId: session.id, email: session.customer_details?.email, amount: session.amount_total });
 
@@ -99,8 +98,6 @@ export async function POST(req: NextRequest) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ orderId, sessionId: session.id, email: session.customer_details?.email || "no-email", amount: session.amount_total || 0 }),
         });
-      } else {
-        console.error("ZAPIER_ORDER_WEBHOOK_URL is not set.");
       }
 
       console.log("Order successfully created from checkout session.");
