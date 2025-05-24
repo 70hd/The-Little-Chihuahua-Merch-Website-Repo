@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
       postalCode: intent.metadata.postalCode || null,
       location: intent.metadata.location || null,
       time: intent.metadata.time || null,
-      ship: intent.metadata.ship === "true" ? true : intent.metadata.ship === "false" ? false : null,
+      // ship: intent.metadata.ship === "true" ? true : intent.metadata.ship === "false" ? false : null,
     };
 
     try {
