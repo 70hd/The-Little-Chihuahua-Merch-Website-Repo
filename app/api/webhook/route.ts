@@ -10,7 +10,7 @@ const zapierUrl = process.env.ZAPIER_ORDER_WEBHOOK_URL;
 
 const prisma = new PrismaClient();
 
-// Correct buffer function for ReadableStream in App Router
+// Correct buffer function for Next.js App Router ReadableStream
 async function buffer(readable: ReadableStream<Uint8Array>): Promise<Buffer> {
   const reader = readable.getReader();
   const chunks: Uint8Array[] = [];
@@ -33,7 +33,6 @@ export async function POST(req: NextRequest) {
     return new Response("Bad Request", { status: 400 });
   }
 
-  // ✅ Make sure req.body is not null
   if (!req.body) {
     console.error("Request body is null.");
     return new Response("Empty body", { status: 400 });
