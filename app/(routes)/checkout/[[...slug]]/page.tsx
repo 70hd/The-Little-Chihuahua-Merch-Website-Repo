@@ -61,7 +61,8 @@ const Checkout: React.FC = () => {
         </button>
         <h1>Checkout</h1>
       </header>
-        <CheckoutPage amount={price.estimatedOrderTotal + price.shippingFee}/>
+        {/* <CheckoutPage amount={price.estimatedOrderTotal + price.shippingFee}/> */}
+        <CheckoutPage amount={1}/>
         </main>
       )
       }

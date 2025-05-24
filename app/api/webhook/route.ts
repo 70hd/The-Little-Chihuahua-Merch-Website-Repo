@@ -2,8 +2,6 @@ import { NextRequest } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import Stripe from 'stripe';
 import { Readable } from 'stream';
-import { PickupContext } from "@/context/pickup-context";
-import { useContext } from 'react';
 
 export const config = {
   api: {
@@ -14,6 +12,7 @@ export const config = {
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-04-30.basil',
 });
+
 const zapierUrl = process.env.ZAPIER_ORDER_WEBHOOK_URL;
 
 async function buffer(readable: Readable) {
@@ -26,24 +25,23 @@ async function buffer(readable: Readable) {
 
 export async function POST(req: NextRequest) {
   const prisma = new PrismaClient();
-  let body: Buffer;
-  let signature = req.headers.get('stripe-signature');
+  const signature = req.headers.get('stripe-signature');
   const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
-  const { location, time,ship } = useContext(PickupContext);
 
-  try {
-    if (!req.body || !signature || !endpointSecret) {
-      console.error("Missing required parts of the request.");
-      return new Response("Bad Request", { status: 400 });
-    }
-
-    body = await buffer(req.body as any);
-  } catch (err) {
-    console.error("Error buffering request body:", err);
-    return new Response("Failed to read request body", { status: 400 });
+  if (!signature || !endpointSecret) {
+    console.error("Missing Stripe signature or secret.");
+    return new Response("Bad Request", { status: 400 });
   }
 
-  let event;
+  let body: Buffer;
+  try {
+    body = await buffer(req.body as any);
+  } catch (err) {
+    console.error("Error reading Stripe body:", err);
+    return new Response("Invalid body", { status: 400 });
+  }
+
+  let event: Stripe.Event;
   try {
     event = stripe.webhooks.constructEvent(body, signature, endpointSecret);
   } catch (err) {
@@ -51,79 +49,67 @@ export async function POST(req: NextRequest) {
     return new Response(`Webhook Error: ${(err as any).message}`, { status: 400 });
   }
 
-  if (event.type === 'checkout.session.completed') {
-    const session = event.data.object as Stripe.Checkout.Session;
+  try {
+    if (event.type === 'payment_intent.succeeded') {
+      const intent = event.data.object as Stripe.PaymentIntent;
 
-    try {
       const orderId = `ORD-${Date.now()}`;
+      console.log("Creating order from payment intent:", { orderId, sessionId: intent.id, email: intent.receipt_email, amount: intent.amount });
 
-      if (ship) {
-        console.log("Creating shipping order:", {
+      await prisma.order.create({
+        data: {
           orderId,
-          sessionId: session.id,
-          email: session.customer_email,
-          amount: session.amount_total,
-          ship: ship
-        });
+          sessionId: intent.id,
+          email: intent.receipt_email || "no-email",
+          amount: intent.amount || 0,
+        },
+      });
 
-        await prisma.order.create({
-          data: {
-            orderId,
-            sessionId: session.id,
-            email: session.customer_email || "no-email",
-            amount: session.amount_total || 0,
-            ship: ship
-          },
+      if (zapierUrl) {
+        await fetch(zapierUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId, sessionId: intent.id, email: intent.receipt_email || "no-email", amount: intent.amount || 0 }),
         });
       } else {
-        console.log("Creating pickup order:", {
+        console.error("ZAPIER_ORDER_WEBHOOK_URL is not set.");
+      }
+
+      console.log("Order successfully created from payment intent.");
+    }
+
+    else if (event.type === 'checkout.session.completed') {
+      const session = event.data.object as Stripe.Checkout.Session;
+
+      const orderId = `ORD-${Date.now()}`;
+      console.log("Creating order from checkout session:", { orderId, sessionId: session.id, email: session.customer_details?.email, amount: session.amount_total });
+
+      await prisma.order.create({
+        data: {
           orderId,
           sessionId: session.id,
-          email: session.customer_email,
-          amount: session.amount_total,
-          location: location,
-          pickupTime: time,
-          ship: ship
-        });
+          email: session.customer_details?.email || "no-email",
+          amount: session.amount_total || 0,
+        },
+      });
 
-        await prisma.order.create({
-          data: {
-            orderId,
-            sessionId: session.id,
-            email: session.customer_email || "no-email",
-            amount: session.amount_total || 0,
-            location: location,
-            pickupTime: time,
-            ship: ship
-          },
+      if (zapierUrl) {
+        await fetch(zapierUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId, sessionId: session.id, email: session.customer_details?.email || "no-email", amount: session.amount_total || 0 }),
         });
+      } else {
+        console.error("ZAPIER_ORDER_WEBHOOK_URL is not set.");
       }
-      try {
-        if (!zapierUrl) {
-          console.error("Missing ZAPIER_ORDER_WEBHOOK_URL environment variable.");
-        } else {
-          await fetch(zapierUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              orderId,
-              sessionId: session.id,
-              email: session.customer_email || "no-email",
-              amount: session.amount_total || 0,
-              ship: ship || null,
-              location: location || null,
-              pickupTime: time || null
-            }),
-          });
-        }
-      } catch (zapError) {
-        console.error(`Failed to notify users for product`, zapError);
-      }
-      console.log("Order successfully created.");
-    } catch (err) {
-      console.error("Error storing order in database:", err);
-      return new Response(`Database Error: ${(err as any).message}`, { status: 500 });
+
+      console.log("Order successfully created from checkout session.");
     }
+  } catch (err) {
+    console.error("Failed to store order:", err);
+    return new Response(`Database Error: ${(err as any).message}`, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 
   return new Response(JSON.stringify({ received: true }), { status: 200 });
