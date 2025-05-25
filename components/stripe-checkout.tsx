@@ -117,7 +117,23 @@ console.log(cartItems)
     if (!validateForm()) return;
 
     setLoading(true);
-
+    console.log(JSON.stringify({
+          amount: convertToSubcurrency(amount),
+          email: userEmail.trim(),
+          // ...shippingInfo,
+          firstName: shippingInfo.firstName,
+          lastName: shippingInfo.lastName,
+          country: shippingInfo.country,
+          address: shippingInfo.address,
+          unitDetails: shippingInfo.unitDetails,
+          city: shippingInfo.city,
+          state: shippingInfo.state,
+          postalCode: shippingInfo.postalCode,
+          location: location,
+          time:time,
+          ship: ship,
+          items: JSON.stringify(cartItems)}))
+          
     let secret = clientSecret;
     if (!secret) {
       const res = await fetch("/api/create-payment-intent", {
