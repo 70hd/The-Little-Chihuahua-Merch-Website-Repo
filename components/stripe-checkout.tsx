@@ -138,7 +138,7 @@ console.log(cartItems)
           location: location,
           time:time,
           ship: ship,
-          items: JSON.stringify(cartItems)
+          // items: JSON.stringify(cartItems)
           
         }),
       });

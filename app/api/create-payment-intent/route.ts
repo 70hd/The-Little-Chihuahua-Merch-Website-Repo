@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
       city,
       state,
       postalCode,
-      items,
+      // items,
     } = await request.json();
 
     if (!amount || amount <= 0) {
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
         location: location || "",
         time: time || "",
         ship: typeof ship === "string" ? ship : JSON.stringify(ship),
-        items: typeof items === "string" ? items : JSON.stringify(items),
+        // items: typeof items === "string" ? items : JSON.stringify(items),
       },
     });
 
