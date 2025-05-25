@@ -25,29 +25,40 @@ export async function POST(request: NextRequest) {
     } = await request.json();
 
     if (!amount || amount <= 0) {
-      throw new Error("Invalid amount");
+      throw new Error("Invalid or missing amount");
     }
+
+    // Safely handle `items`
+    let parsedItems = [];
+    try {
+      parsedItems = typeof items === "string" ? JSON.parse(items) : items || [];
+    } catch (err) {
+      console.warn("⚠️ Failed to parse `items` metadata:", err);
+      parsedItems = [];
+    }
+
+    const metadata = {
+      email: email || "",
+      firstName: firstName || "",
+      lastName: lastName || "",
+      country: country || "",
+      address: address || "",
+      unitDetails: unitDetails || "",
+      city: city || "",
+      state: state || "",
+      postalCode: postalCode || "",
+      location: location || "",
+      time: time || "",
+      ship: typeof ship === "string" ? ship : JSON.stringify(ship),
+      items: JSON.stringify(parsedItems),
+    };
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency: "usd",
       receipt_email: email,
       automatic_payment_methods: { enabled: true },
-   metadata: {
-  email: email || "",
-  firstName: firstName || "",
-  lastName: lastName || "",
-  country: country || "",
-  address: address || "",
-  unitDetails: unitDetails || "",
-  city: city || "",
-  state: state || "",
-  postalCode: postalCode || "",
-  location: location || "",
-  time: time || "",
-  ship: typeof ship === "string" ? ship : JSON.stringify(ship),
-  items: typeof items === "string" ? items : JSON.stringify(items),
-}
+      metadata,
     });
 
     return NextResponse.json({
@@ -55,9 +66,9 @@ export async function POST(request: NextRequest) {
       paymentIntentId: paymentIntent.id,
     });
   } catch (error: any) {
-    console.error("Internal Error:", error);
+    console.error("❌ Internal Error:", error.message || error);
     return NextResponse.json(
-      { error: `Internal Server Error: ${error.message}` },
+      { error: "Internal Server Error", message: error.message || "Unknown error" },
       { status: 500 }
     );
   }
