@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
       city,
       state,
       postalCode,
-      // items,
+      items,
     } = await request.json();
 
     if (!amount || amount <= 0) {
@@ -33,21 +33,21 @@ export async function POST(request: NextRequest) {
       currency: "usd",
       receipt_email: email,
       automatic_payment_methods: { enabled: true },
-      metadata: {
-        email: email || "",
-        firstName: firstName || "",
-        lastName: lastName || "",
-        country: country || "",
-        address: address || "",
-        unitDetails: unitDetails || "",
-        city: city || "",
-        state: state || "",
-        postalCode: postalCode || "",
-        location: location || "",
-        time: time || "",
-        ship: typeof ship === "string" ? ship : JSON.stringify(ship),
-        // items: typeof items === "string" ? items : JSON.stringify(items),
-      },
+   metadata: {
+  email: email || "",
+  firstName: firstName || "",
+  lastName: lastName || "",
+  country: country || "",
+  address: address || "",
+  unitDetails: unitDetails || "",
+  city: city || "",
+  state: state || "",
+  postalCode: postalCode || "",
+  location: location || "",
+  time: time || "",
+  ship: typeof ship === "string" ? ship : JSON.stringify(ship),
+  items: typeof items === "string" ? items : JSON.stringify(items),
+}
     });
 
     return NextResponse.json({

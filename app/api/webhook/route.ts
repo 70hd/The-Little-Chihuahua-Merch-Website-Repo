@@ -65,6 +65,7 @@ export async function POST(req: NextRequest) {
     } catch {
       console.warn("Failed to parse order items JSON.");
     }
+    console.log("🧾 Parsed items:", items);
 
     const orderData = {
       orderId,
@@ -118,13 +119,13 @@ export async function POST(req: NextRequest) {
  await prisma.order.create({
   data: {
     ...orderData,
-    // OrderItem: {
-    //   create: items.map((item: any) => ({
-    //     productId: item.id,
-    //     quantity: item.quantity,
-    //     price: item.price * 100,
-    //   })),
-    // },
+    OrderItem: {
+      create: items.map((item: any) => ({
+        productId: item.id,
+        quantity: item.quantity,
+        price: item.price * 100,
+      })),
+    },
   },
 });
       if (zapierUrl) {
