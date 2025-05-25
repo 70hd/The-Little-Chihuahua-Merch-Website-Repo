@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
       state: intent.metadata.state || null,
       postalCode: intent.metadata.postalCode || null,
       location: intent.metadata.location || null,
-      time: intent.metadata.time || null,
+      pickupTime: intent.metadata.time || null,
       ship: intent.metadata.ship === "true" ? true : intent.metadata.ship === "false" ? false : null,
     };
 
