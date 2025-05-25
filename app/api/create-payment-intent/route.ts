@@ -28,14 +28,17 @@ export async function POST(request: NextRequest) {
       throw new Error("Invalid or missing amount");
     }
 
-    // Safely handle `items`
-    let parsedItems = [];
-    try {
-      parsedItems = typeof items === "string" ? JSON.parse(items) : items || [];
-    } catch (err) {
-      console.warn("⚠️ Failed to parse `items` metadata:", err);
-      parsedItems = [];
-    }
+
+    const cleanedItems = (Array.isArray(items) ? items : JSON.parse(items || "[]")).map(
+  (item: any) => ({
+    id: item.id,
+    title: item.title,
+    price: item.price,
+    quantity: item.quantity ?? 1,
+    size: item.size,
+    color: item.color,
+  })
+);
 
     const metadata = {
       email: email || "",
@@ -50,7 +53,7 @@ export async function POST(request: NextRequest) {
       location: location || "",
       time: time || "",
       ship: typeof ship === "string" ? ship : JSON.stringify(ship),
-      items: JSON.stringify(parsedItems),
+      items: JSON.stringify(cleanedItems),
     };
 
     const paymentIntent = await stripe.paymentIntents.create({
