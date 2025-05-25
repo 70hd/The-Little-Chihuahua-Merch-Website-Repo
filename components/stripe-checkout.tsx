@@ -10,6 +10,7 @@ import convertToSubcurrency from "@/lib/convert-to-sub-currency";
 import Button from "./button";
 import Input from "./input";
 import { PickupContext } from "@/context/pickup-context";
+import { useCart } from "@/context/cart-context";
 
 type ShippingField = {
   name: string;
@@ -31,10 +32,11 @@ const initialShipping = {
 };
 
 const CheckoutPageFunc = ({ amount }: { amount: number }) => {
+    const { cartItems } = useCart();
   const { ship,time,location } = useContext(PickupContext);
   const stripe = useStripe();
   const elements = useElements();
-
+console.log(cartItems)
   const [userEmail, setUserEmail] = useState("");
   const [shippingInfo, setShippingInfo] = useState(initialShipping);
   const [clientSecret, setClientSecret] = useState("");
@@ -135,7 +137,9 @@ const CheckoutPageFunc = ({ amount }: { amount: number }) => {
           postalCode: shippingInfo.postalCode,
           location: location,
           time:time,
-          ship: ship
+          ship: ship,
+          items: cartItems
+          
         }),
       });
       const data = await res.json();

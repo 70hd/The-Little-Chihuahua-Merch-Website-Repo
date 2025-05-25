@@ -1,13 +1,14 @@
-import { NextRequest } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-import Stripe from 'stripe';
+import { NextRequest } from "next/server";
+import { PrismaClient } from "@prisma/client";
+import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-04-30.basil',
+  apiVersion: "2025-04-30.basil",
 });
 
 const zapierUrl = process.env.ZAPIER_ORDER_WEBHOOK_URL;
-const zapierOrderConformationUrl= process.env.ZAPIER_ORDER_CONFORMATION_WEBHOOK_URL
+const zapierOrderConformationUrl =
+  process.env.ZAPIER_ORDER_CONFORMATION_WEBHOOK_URL;
 const prisma = new PrismaClient();
 
 async function buffer(readable: ReadableStream<Uint8Array>): Promise<Buffer> {
@@ -24,7 +25,7 @@ async function buffer(readable: ReadableStream<Uint8Array>): Promise<Buffer> {
 }
 
 export async function POST(req: NextRequest) {
-  const signature = req.headers.get('stripe-signature');
+  const signature = req.headers.get("stripe-signature");
   const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
   if (!signature || !endpointSecret) {
@@ -53,54 +54,107 @@ export async function POST(req: NextRequest) {
     return new Response("Signature error", { status: 400 });
   }
 
-  if (event.type === 'payment_intent.succeeded') {
+  if (event.type === "payment_intent.succeeded") {
     const intent = event.data.object as Stripe.PaymentIntent;
     const orderId = `ORD-${Date.now()}`;
-    console.log("PaymentIntent metadata:", intent.metadata);
+
+    // Parse items JSON string from metadata (safe fallback to empty array)
+    let items = [];
+    try {
+      items = JSON.parse(intent.metadata.items || "[]");
+    } catch {
+      console.warn("Failed to parse order items JSON.");
+    }
 
     const orderData = {
       orderId,
       sessionId: intent.id,
       email: intent.receipt_email || "no-email",
-      amount: intent.amount || 0,
-      firstName: intent.metadata.firstName || null,
-      lastName: intent.metadata.lastName || null,
-      country: intent.metadata.country || null,
-      address: intent.metadata.address || null,
-      unitDetails: intent.metadata.unitDetails || null,
-      city: intent.metadata.city || null,
-      state: intent.metadata.state || null,
-      postalCode: intent.metadata.postalCode || null,
-      location: intent.metadata.location || null,
-      pickupTime: intent.metadata.time || null,
-      ship: intent.metadata.ship === "true" ? true : intent.metadata.ship === "false" ? false : null,
+      amount: (intent.amount || 0) / 100,
+      ship:
+        intent.metadata.ship === "true"
+          ? true
+          : intent.metadata.ship === "false"
+          ? false
+          : null,
+      firstName:
+        intent.metadata.ship === "true"
+          ? intent.metadata.firstName || null
+          : null,
+      lastName:
+        intent.metadata.ship === "true"
+          ? intent.metadata.lastName || null
+          : null,
+      country:
+        intent.metadata.ship === "true"
+          ? intent.metadata.country || null
+          : null,
+      address:
+        intent.metadata.ship === "true"
+          ? intent.metadata.address || null
+          : null,
+      unitDetails:
+        intent.metadata.ship === "true"
+          ? intent.metadata.unitDetails || null
+          : null,
+      city:
+        intent.metadata.ship === "true" ? intent.metadata.city || null : null,
+      state:
+        intent.metadata.ship === "true" ? intent.metadata.state || null : null,
+      postalCode:
+        intent.metadata.ship === "true"
+          ? intent.metadata.postalCode || null
+          : null,
+      location:
+        intent.metadata.ship !== "true"
+          ? intent.metadata.location || null
+          : null,
+      pickupTime:
+        intent.metadata.ship !== "true" ? intent.metadata.time || null : null,
     };
 
     try {
-      console.log("✅ Creating order:", orderData);
-      await prisma.order.create({ data: orderData });
-
+      // Create order along with order items in one transaction
+ await prisma.order.create({
+  data: {
+    ...orderData,
+    OrderItem: {
+      create: items.map((item: any) => ({
+        productId: item.id,
+        quantity: item.quantity,
+        price: item.price * 100,
+      })),
+    },
+  },
+});
       if (zapierUrl) {
-        await fetch(zapierUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const res = await fetch(zapierUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(orderData),
         });
-      }
-      if(zapierOrderConformationUrl) {
-        await fetch(zapierOrderConformationUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(orderData),
-        });
+        if (!res.ok) {
+          console.error(`Zapier Order Webhook failed: ${res.statusText}`);
+        }
       }
 
-      console.log("✅ Order stored and webhook sent to Zapier.");
+      if (zapierOrderConformationUrl) {
+        const res = await fetch(zapierOrderConformationUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(orderData),
+        });
+        if (!res.ok) {
+          console.error(
+            `Zapier Confirmation Webhook failed: ${res.statusText}`
+          );
+        }
+      }
     } catch (err) {
-      console.error("❌ Failed to store order:", err);
-      return new Response("Database error", { status: 500 });
+      console.error("❌ Zapier webhook POST error:", err);
     } finally {
       await prisma.$disconnect();
+      return new Response("Database error", { status: 500 });
     }
   }
   console.log("Webhook triggered:", event.type);

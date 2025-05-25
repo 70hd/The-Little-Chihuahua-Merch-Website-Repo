@@ -37,6 +37,7 @@ model Product {
   colorName   String
   status      Product_status?
   inventory   Int
+  OrderItem   OrderItem[]
 }
 
 model RestockNotification {
@@ -54,25 +55,39 @@ model Size {
 }
 
 model Order {
-  id          Int      @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   orderId     String
   sessionId   String
   email       String?
   amount      Int?
-  createdAt   DateTime @default(now())
+  createdAt   DateTime    @default(now())
   ship        Boolean?
-  location    String?  @db.VarChar(255)
-  pickupTime  String?  @db.VarChar(255)
-  firstName   String?  @db.VarChar(255)
-  lastName    String?  @db.VarChar(255)
-  country     String?  @db.VarChar(255)
-  address     String?  @db.VarChar(255)
-  unitDetails String?  @db.VarChar(255)
-  city        String?  @db.VarChar(255)
-  state       String?  @db.VarChar(255)
-  postalCode  String?  @db.VarChar(255)
+  location    String?     @db.VarChar(255)
+  pickupTime  String?     @db.VarChar(255)
+  firstName   String?     @db.VarChar(255)
+  lastName    String?     @db.VarChar(255)
+  country     String?     @db.VarChar(255)
+  address     String?     @db.VarChar(255)
+  unitDetails String?     @db.VarChar(255)
+  city        String?     @db.VarChar(255)
+  state       String?     @db.VarChar(255)
+  postalCode  String?     @db.VarChar(255)
+  OrderItem   OrderItem[]
 
   @@map("orders")
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  quantity  Int
+  price     Int
+  orders    Order   @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_1")
+  Product   Product @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_2")
+
+  @@index([orderId], map: "fk_1")
+  @@index([productId], map: "fk_2")
 }
 
 enum Size_status {
