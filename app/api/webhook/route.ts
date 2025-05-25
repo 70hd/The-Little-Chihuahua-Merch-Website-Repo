@@ -116,18 +116,22 @@ export async function POST(req: NextRequest) {
 
     try {
       // Create order along with order items in one transaction
- await prisma.order.create({
-  data: {
-    ...orderData,
-    OrderItem: {
-      create: items.map((item: any) => ({
-        productId: item.id,
-        quantity: item.quantity,
-        price: item.price * 100,
-      })),
-    },
-  },
-});
+      await prisma.order.create({
+        data: {
+          ...orderData,
+          OrderItem: {
+            create: items.map((item: any) => ({
+              productId: item.id,
+              quantity: item.quantity,
+              price: item.price,
+              id: item.id,
+              // title: item.title,
+              selectedSize: item.size,
+              color: item.color,
+            })),
+          },
+        },
+      });
       if (zapierUrl) {
         const res = await fetch(zapierUrl, {
           method: "POST",
