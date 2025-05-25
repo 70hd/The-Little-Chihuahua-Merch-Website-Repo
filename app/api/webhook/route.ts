@@ -7,6 +7,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 const zapierUrl = process.env.ZAPIER_ORDER_WEBHOOK_URL;
+const zapierOrderConformationUrl= process.env.ZAPIER_ORDER_CONFORMATION_WEBHOOK_URL
 const prisma = new PrismaClient();
 
 async function buffer(readable: ReadableStream<Uint8Array>): Promise<Buffer> {
@@ -81,6 +82,13 @@ export async function POST(req: NextRequest) {
 
       if (zapierUrl) {
         await fetch(zapierUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(orderData),
+        });
+      }
+      if(zapierOrderConformationUrl) {
+        await fetch(zapierOrderConformationUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(orderData),
