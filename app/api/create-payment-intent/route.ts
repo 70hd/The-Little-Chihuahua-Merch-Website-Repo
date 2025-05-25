@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
         location: location || "",
         time: time || "",
         ship: typeof ship === "string" ? ship : JSON.stringify(ship),
-        items: JSON.stringify(items || [])
+        items: typeof items === "string" ? items : JSON.stringify(items),
       },
     });
 
