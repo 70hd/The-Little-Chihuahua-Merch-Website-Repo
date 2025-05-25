@@ -179,7 +179,7 @@ console.log(cartItems)
       {/* Contact Info */}
       <section className="p-12 flex flex-col gap-6 bg-black/5" aria-labelledby="contact-info">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 text-white bg-black rounded-full flex items-center justify-center">
+          <div className="w-8 h-8 text-white bg-[#221E1F] rounded-full flex items-center justify-center">
             <span>1</span>
           </div>
           <h2 id="contact-info">Contact</h2>
@@ -204,7 +204,7 @@ console.log(cartItems)
       {ship && (
         <section className="p-12 flex flex-col gap-6 bg-black/5" aria-labelledby="shipping-info">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 text-white bg-black rounded-full flex items-center justify-center">
+            <div className="w-8 h-8 text-white bg-[#221E1F]  rounded-full flex items-center justify-center">
               <span>2</span>
             </div>
             <h2 id="shipping-info">Shipping</h2>
@@ -236,7 +236,7 @@ console.log(cartItems)
       {/* Payment Info */}
       <section className="p-12 flex flex-col gap-6 bg-black/5" aria-labelledby="express-checkout">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 text-white bg-black rounded-full flex items-center justify-center">
+          <div className="w-8 h-8 text-white bg-[#221E1F]  rounded-full flex items-center justify-center">
             <span>{ship ? 3 : 2}</span>
           </div>
           <h2 id="express-checkout">Express Checkout</h2>
