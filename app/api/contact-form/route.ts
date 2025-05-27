@@ -36,20 +36,25 @@ export async function POST(req: Request) {
       },
     });
 
-    const zapierUrl = process.env.ZAPIER_CONTACT_FORM_WEBHOOK_URL;
+    const googleSheetsUrl = process.env.GOOGLE_SHEETS_CONTACT_FORM_WEBHOOK_URL;
 
-    if (!zapierUrl) {
-      throw new Error("Zapier webhook URL is not defined");
+    if (!googleSheetsUrl) {
+      throw new Error("Google Sheets webhook URL is not defined");
     }
 
-    const zapRes = await fetch(zapierUrl, {
+    // const zapRes = await fetch(googleSheetsUrl, {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({ name, email, phoneNumber, selectLocation, comments }),
+    // });
+       const zapRes = await fetch(googleSheetsUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, phoneNumber, selectLocation, comments }),
+      body: JSON.stringify({ name, email,selectLocation, comments, phoneNumber }),
     });
 
     if (!zapRes.ok) {
-      console.error("Zapier request failed:", zapRes.status);
+      console.error("Google Sheets request failed:", zapRes.status);
     }
 
     return new Response(JSON.stringify(updateForm), { status: 200 });

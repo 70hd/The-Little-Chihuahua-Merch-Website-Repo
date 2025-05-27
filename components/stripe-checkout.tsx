@@ -133,7 +133,7 @@ console.log(cartItems)
           time:time,
           ship: ship,
           items: JSON.stringify(cartItems)}))
-          
+
     let secret = clientSecret;
     if (!secret) {
       const res = await fetch("/api/create-payment-intent", {
@@ -182,7 +182,7 @@ console.log(cartItems)
     if (error) {
       setErrorMessage(error.message);
     } else if (paymentIntent?.status === "succeeded") {
-      window.location.href = `${window.location.origin}/payment-success?payment_intent=${paymentIntent.id}`;
+     window.location.href = `${window.location.origin}/payment-success?payment_intent=${paymentIntent.id}&order_id=ORD-${Date.now()}`;
     } else {
       setErrorMessage("Payment was not completed.");
     }

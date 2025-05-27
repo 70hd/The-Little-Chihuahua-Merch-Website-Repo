@@ -5,22 +5,18 @@ import Stripe from "stripe";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-04-30.basil",
 });
-
-const zapierUrl = process.env.ZAPIER_ORDER_WEBHOOK_URL;
-const zapierOrderConformationUrl =
-  process.env.ZAPIER_ORDER_CONFORMATION_WEBHOOK_URL;
 const prisma = new PrismaClient();
+
+const googleSheetsOrderWebhookUrl = process.env.GOOGLE_SHEETS_WEBHOOK_URL;
 
 async function buffer(readable: ReadableStream<Uint8Array>): Promise<Buffer> {
   const reader = readable.getReader();
   const chunks: Uint8Array[] = [];
-
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
     if (value) chunks.push(value);
   }
-
   return Buffer.concat(chunks);
 }
 
@@ -29,139 +25,105 @@ export async function POST(req: NextRequest) {
   const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
   if (!signature || !endpointSecret) {
-    console.error("❌ Missing Stripe signature or secret.");
-    return new Response("Bad Request", { status: 400 });
-  }
-
-  if (!req.body) {
-    console.error("❌ Request body is null.");
-    return new Response("Empty body", { status: 400 });
+    return new Response("Missing Stripe signature or secret", { status: 400 });
   }
 
   let rawBody: Buffer;
   try {
+    if (!req.body) {
+  return new Response("Empty request body", { status: 400 });
+}
+
     rawBody = await buffer(req.body);
-  } catch (err) {
-    console.error("❌ Error buffering body:", err);
-    return new Response("Invalid body", { status: 400 });
+  } catch {
+    return new Response("Failed to read request body", { status: 400 });
   }
 
   let event: Stripe.Event;
   try {
     event = stripe.webhooks.constructEvent(rawBody, signature, endpointSecret);
-  } catch (err) {
-    console.error("❌ Webhook signature verification failed:", err);
-    return new Response("Signature error", { status: 400 });
+  } catch {
+    return new Response("Invalid Stripe signature", { status: 400 });
   }
 
-  if (event.type === "payment_intent.succeeded") {
-    const intent = event.data.object as Stripe.PaymentIntent;
-    const orderId = `ORD-${Date.now()}`;
+  if (event.type !== "payment_intent.succeeded") {
+    return new Response("Event not handled", { status: 200 });
+  }
 
-    // Parse items JSON string from metadata (safe fallback to empty array)
-    let items = [];
-    try {
-      items = JSON.parse(intent.metadata.items || "[]");
-    } catch {
-      console.warn("Failed to parse order items JSON.");
-    }
-    console.log("🧾 Parsed items:", items);
+  const intent = event.data.object as Stripe.PaymentIntent;
+  const orderId = `ORD-${Date.now()}`;
 
-    const orderData = {
-      orderId,
-      sessionId: intent.id,
-      email: intent.receipt_email || "no-email",
-      amount: (intent.amount || 0) / 100,
-      ship:
-        intent.metadata.ship === "true"
-          ? true
-          : intent.metadata.ship === "false"
-          ? false
-          : null,
-      firstName:
-        intent.metadata.ship === "true"
-          ? intent.metadata.firstName || null
-          : null,
-      lastName:
-        intent.metadata.ship === "true"
-          ? intent.metadata.lastName || null
-          : null,
-      country:
-        intent.metadata.ship === "true"
-          ? intent.metadata.country || null
-          : null,
-      address:
-        intent.metadata.ship === "true"
-          ? intent.metadata.address || null
-          : null,
-      unitDetails:
-        intent.metadata.ship === "true"
-          ? intent.metadata.unitDetails || null
-          : null,
-      city:
-        intent.metadata.ship === "true" ? intent.metadata.city || null : null,
-      state:
-        intent.metadata.ship === "true" ? intent.metadata.state || null : null,
-      postalCode:
-        intent.metadata.ship === "true"
-          ? intent.metadata.postalCode || null
-          : null,
-      location:
-        intent.metadata.ship !== "true"
-          ? intent.metadata.location || null
-          : null,
-      pickupTime:
-        intent.metadata.ship !== "true" ? intent.metadata.time || null : null,
-    };
+  let items: any[] = [];
+  try {
+    items = JSON.parse(intent.metadata.items || "[]");
+  } catch {
+    console.warn("Failed to parse items JSON");
+  }
 
-    try {
-      // Create order along with order items in one transaction
-      await prisma.order.create({
-        data: {
-          ...orderData,
-          OrderItem: {
-            create: items.map((item: any) => ({
-              productId: item.id,
-              quantity: item.quantity,
-              price: item.price,
-              id: item.id,
-              // title: item.title,
-              selectedSize: item.size,
-              color: item.color,
-            })),
-          },
+  const ship = intent.metadata.ship === "true";
+  const orderData = {
+    orderId,
+    email: intent.receipt_email || "no-email",
+    firstName: ship ? intent.metadata.firstName || null : null,
+    lastName: ship ? intent.metadata.lastName || null : null,
+    amount: (intent.amount || 0) / 100,
+    sessionId: intent.id,
+    ship: ship ? true : intent.metadata.ship === "false" ? false : null,
+    country: ship ? intent.metadata.country || null : null,
+    state: ship ? intent.metadata.state || null : null,
+    city: ship ? intent.metadata.city || null : null,
+    address: ship ? intent.metadata.address || null : null,
+    postalCode: ship ? intent.metadata.postalCode || null : null,
+    unitDetails: ship ? intent.metadata.unitDetails || null : null,
+    location: !ship ? intent.metadata.location || null : null,
+    pickupTime: !ship ? intent.metadata.time || null : null,
+  };
+
+  try {
+    // Save to database
+    await prisma.order.create({
+      data: {
+        ...orderData,
+        OrderItem: {
+          create: items.map((item) => ({
+            productId: item.id,
+            quantity: item.quantity,
+            price: item.price,
+            id: item.id,
+            selectedSize: item.size,
+            color: item.color,
+          })),
         },
-      });
-      if (zapierUrl) {
-        const res = await fetch(zapierUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(orderData),
-        });
-        if (!res.ok) {
-          console.error(`Zapier Order Webhook failed: ${res.statusText}`);
-        }
-      }
+      },
+    });
 
-      if (zapierOrderConformationUrl) {
-        const res = await fetch(zapierOrderConformationUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(orderData),
-        });
-        if (!res.ok) {
-          console.error(
-            `Zapier Confirmation Webhook failed: ${res.statusText}`
-          );
-        }
+    // Send to Google Sheets
+    if (googleSheetsOrderWebhookUrl) {
+      const googleSheetsPayload = items.map((item) => ({
+        ...orderData,
+        productId: item.id,
+        quantity: item.quantity,
+        price: item.price,
+        selectedSize: item.size,
+        color: item.color,
+      }));
+
+      const res = await fetch(googleSheetsOrderWebhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(googleSheetsPayload),
+      });
+
+      if (!res.ok) {
+        console.error("Google Sheets webhook failed:", res.statusText);
       }
-    } catch (err) {
-      console.error("❌ Zapier webhook POST error:", err);
-    } finally {
-      await prisma.$disconnect();
-      return new Response("Database error", { status: 500 });
     }
+  } catch (err) {
+    console.error("❌ Error handling order:", err);
+    return new Response("Internal error", { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
-  console.log("Webhook triggered:", event.type);
-  return new Response("Webhook received", { status: 200 });
+
+  return new Response("Order processed", { status: 200 });
 }

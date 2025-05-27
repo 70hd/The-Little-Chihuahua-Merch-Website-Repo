@@ -20,9 +20,9 @@ export default function PaymentSuccessPage() {
       .catch(() => setStatus("error"));
   }, [paymentIntentId]);
 
-  if (status === "checking") return <p>Checking payment status...</p>;
+  if (status === "checking") return <p className="dynamic-y-padding dynamic-x-padding">Checking payment status...</p>;
   if (status === "failed" || status === "error")
-    return <p>Payment was not successful. Please try again.</p>;
+    return <p className="dynamic-y-padding dynamic-x-padding">Payment was not successful. Please try again.</p>;
 
   return (
       <PaymentSuccess />

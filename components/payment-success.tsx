@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 
 export default function PaymentSuccess() {
-  const [paymentIntentId, setPaymentIntentId] = useState("");
+  const [orderId, setOrderId] = useState("");
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
-    const id = searchParams.get("payment_intent");
-    if (id) setPaymentIntentId(id);
+   const id = searchParams.get("order_id");
+    if (id) setOrderId(id);
   }, []);
 
   return (
@@ -19,7 +19,7 @@ export default function PaymentSuccess() {
           Thank you for your purchase
         </h1>
         <h2 className="text-[#16767E]" tabIndex={0}>
-          {paymentIntentId ? `Your order is #${paymentIntentId}` : "Loading order ID..."}
+          {orderId ? `Your order is #${orderId}` : "Loading order ID..."}
         </h2>
       </header>
       <section className="flex flex-col gap-[16px]">
