@@ -36,7 +36,7 @@ const CheckoutPageFunc = ({ amount }: { amount: number }) => {
   const { ship,time,location } = useContext(PickupContext);
   const stripe = useStripe();
   const elements = useElements();
-console.log(cartItems)
+
   const [userEmail, setUserEmail] = useState("");
   const [shippingInfo, setShippingInfo] = useState(initialShipping);
   const [clientSecret, setClientSecret] = useState("");
@@ -44,22 +44,32 @@ console.log(cartItems)
   const [errorMessage, setErrorMessage] = useState<string>();
   const [loading, setLoading] = useState(false);
   useEffect(() => {
-    console.log(JSON.stringify({
-      amount: convertToSubcurrency(amount),
-      email: userEmail.trim(),
-      // ...shippingInfo,
-      firstName: shippingInfo.firstName,
-      lastName: shippingInfo.lastName,
-      country: shippingInfo.country,
-      address: shippingInfo.address,
-      unitDetails: shippingInfo.unitDetails,
-      city: shippingInfo.city,
-      state: shippingInfo.state,
-      postalCode: shippingInfo.postalCode,
-      location: location,
-      time:time,
-      ship: JSON.stringify(ship)
-    }))
+console.log(JSON.stringify({
+          orderId: Date.now(),
+          email: userEmail.trim(),
+          firstName: shippingInfo.firstName,
+          lastName: shippingInfo.lastName,
+          amount: convertToSubcurrency(amount),
+          sessionId: "1341daf1d14f",
+          ship: ship,
+          country: shippingInfo.country,
+          
+          state: shippingInfo.state,
+          city: shippingInfo.city,
+          address: shippingInfo.address,
+          postalCode: shippingInfo.postalCode,
+          unitDetails: shippingInfo.unitDetails,
+          location: location,
+          pickupTime:time,
+          OrderItem: cartItems.map((item) => ({
+          productId: item.id,
+          quantity: item.quantity,
+          price: item.price,
+          id: 2,
+          selectedSize: item.size,
+          color: item.color,
+        }))})
+        )
   },[shippingInfo])
 
   const handleChange = (key: keyof typeof initialShipping, value: string) =>
@@ -120,7 +130,6 @@ console.log(cartItems)
     console.log(JSON.stringify({
           amount: convertToSubcurrency(amount),
           email: userEmail.trim(),
-          // ...shippingInfo,
           firstName: shippingInfo.firstName,
           lastName: shippingInfo.lastName,
           country: shippingInfo.country,
@@ -132,7 +141,14 @@ console.log(cartItems)
           location: location,
           time:time,
           ship: ship,
-          items: JSON.stringify(cartItems)}))
+            products: cartItems.map((item) => ({
+          productId: item.id,
+          quantity: item.quantity,
+          price: item.price,
+          selectedSize: item.size,
+          color: item.color,
+        }))})
+        )
 
     let secret = clientSecret;
     if (!secret) {
