@@ -115,6 +115,8 @@ export async function POST(req: NextRequest) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+      const text = await res.text(); // 👈 log the actual body
+      console.log("Webhook response:", res.status, text);
 
       if (!res.ok) {
         console.error("Google Sheets webhook failed:", res.statusText);
