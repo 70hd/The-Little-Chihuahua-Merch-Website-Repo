@@ -31,8 +31,8 @@ export async function POST(req: NextRequest) {
   let rawBody: Buffer;
   try {
     if (!req.body) {
-  return new Response("Empty request body", { status: 400 });
-}
+      return new Response("Empty request body", { status: 400 });
+    }
 
     rawBody = await buffer(req.body);
   } catch {
@@ -97,21 +97,23 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Send to Google Sheets
+    // ✅ Send as a single object with `products` array to Google Sheets webhook
     if (googleSheetsOrderWebhookUrl) {
-      const googleSheetsPayload = items.map((item) => ({
+      const payload = {
         ...orderData,
-        productId: item.id,
-        quantity: item.quantity,
-        price: item.price,
-        selectedSize: item.size,
-        color: item.color,
-      }));
+        products: items.map((item) => ({
+          productId: item.id,
+          quantity: item.quantity,
+          price: item.price,
+          selectedSize: item.size,
+          color: item.color,
+        })),
+      };
 
       const res = await fetch(googleSheetsOrderWebhookUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(googleSheetsPayload),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
