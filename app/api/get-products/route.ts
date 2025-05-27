@@ -63,16 +63,20 @@ export async function GET() {
 
       if (usersForProduct.length > 0) {
         try {
-          await fetch(googleSheetsUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              productName: product.title,
-              emails: usersForProduct
-                .map((u) => u.email)
-                .filter((email): email is string => email !== null),
-            }),
-          });
+          await Promise.all(
+  usersForProduct.map((user) => {
+    if (!user.email) return;
+
+    return fetch(googleSheetsUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: user.email,
+        productName: product.title,
+      }),
+    });
+  })
+);
 
           notifyUsers.push({
             productId: product.id,

@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
     if (googleSheetsOrderWebhookUrl) {
       const payload = {
         ...orderData,
-        products: items.map((item) => ({
+        product: items.map((item) => ({
           productId: item.id,
           quantity: item.quantity,
           price: item.price,
