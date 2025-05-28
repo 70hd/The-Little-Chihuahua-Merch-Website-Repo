@@ -51,7 +51,6 @@ const CartDisplay: React.FC<CartDisplayProps> = ({
     const estimatedTaxes = Math.round(subtotal * taxRate);
     const shippingFee = ship ? 10 : 0
     const estimatedOrderTotal = Math.round(subtotal + shippingFee + estimatedTaxes);
-console.log({ship:shippingFee})
     setPrice({
       subtotal,
       estimatedTaxes,
@@ -87,6 +86,7 @@ console.log({ship:shippingFee})
         aria-label="Cart items"
       >
         {cartItems.map((item: CartItem, index: number) => {
+         
           return (
             <CartProductCard
               key={index}

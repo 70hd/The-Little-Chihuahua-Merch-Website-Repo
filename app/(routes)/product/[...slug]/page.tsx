@@ -20,6 +20,7 @@ interface SizeOption {
   id?: number;
   size: string;
   status?: string;
+  inventory?: number | undefined;
 }
 interface Errors {
   email: string;
@@ -55,7 +56,30 @@ const ProductPage = () => {
   const [restockNotification, setRestockNotification] = useState<string>("");
   const [errors, setErrors] = useState<Errors>({ email: "", size: "" });
   const [restockLoading, setRestockLoading] = useState(false);
+  const [maxQuantity, setMaxQuantity] = useState(100);
 
+  useEffect(() => {
+    if (size.size !== "Select Size") {
+      const option = product?.sizeOptions.find((opt) => opt.size === size.size);
+      if (option && typeof option.inventory === "number") {
+        setMaxQuantity(option.inventory);
+      }
+    } else {
+      setMaxQuantity(100);
+    }
+  }, [size.size, product]);
+
+  useEffect(() => {
+    if (size.size === "Select Size") {
+      setMaxQuantity(100);
+    }
+  }, [size]);
+  useEffect(() => {
+    console.log(maxQuantity);
+  }, [maxQuantity]);
+  useEffect(() => {
+    console.log(size);
+  }, [size]);
   const ToggleRestockNotification = async () => {
     setRestockLoading(true);
 
@@ -92,16 +116,15 @@ const ProductPage = () => {
     setRestockNotification(e.target.value);
   };
 
-
   useEffect(() => {
     const filteredProduct = products?.find((p) => p.title === url);
     if (filteredProduct) {
       setProduct({
         ...filteredProduct,
-        id: Number(filteredProduct.id), 
+        id: Number(filteredProduct.id),
         sizeOptions: filteredProduct.sizeOptions.map((sizeOption, index) => ({
           ...sizeOption,
-          id: index, 
+          id: index,
         })),
         images: filteredProduct.images ?? [],
       });
@@ -113,7 +136,6 @@ const ProductPage = () => {
       setPrice(filteredProduct.priceOptions[0]);
     }
   }, [products, url]);
-
 
   useEffect(() => {
     if (product?.sizeOptions?.length === 1) {
@@ -199,13 +221,15 @@ const ProductPage = () => {
             )}
           </div>
 
-          <h1 className="text-2xl font-semibold">{loading ? url: product?.title}</h1>
+          <h1 className="text-2xl font-semibold">
+            {loading ? url : product?.title}
+          </h1>
         </div>
 
         <p>{product?.description}</p>
 
         <div className="flex flex-col gap-2">
-          <p>Color: {loading? "loading" : `${color.colorName}`}</p>
+          <p>Color: {loading ? "loading" : `${color.colorName}`}</p>
           <div className="flex gap-3">
             <div
               className="w-5 h-5 p-[2px] border border-black"
@@ -223,95 +247,111 @@ const ProductPage = () => {
           </div>
         </div>
 
-        { product?.status !== "OUT_OF_STOCK" ? !loading && (
-          <div className="flex flex-col gap-6">
-            <div className="flex flex-col gap-2 relative">
-              <label
-                htmlFor="size-select"
-                className={`font-medium ${sizeError && "text-[#CD3626]"}`}
-              >
-                {sizeError ? "Please Select A Size" : "Size"}
-              </label>
-              <select
-                id="size-select"
-                className="border text-[1.1rem] text-black/75 border-black/75 p-3 pr-10 rounded w-full appearance-none focus:outline-none focus:ring-0"
-                onChange={(e) => {
-                  const selectedSize = product?.sizeOptions.find(
-                    (opt) => opt.size === e.target.value
-                  );
-                  if (selectedSize) setSize(selectedSize);
-                }}
-                aria-label="Select product size"
-              >
-                {product?.sizeOptions?.length === 1 ? (
-                  <option value={product.sizeOptions[0].size}>
-                    {product.sizeOptions[0].size}
-                  </option>
-                ) : (
-                  <>
-                    <option value={loading? "...loading" : "Select Size"}>{loading? "...loading" : "Select Size"}</option>
-                    {product?.sizeOptions.map((opt) => (
-                      <option
-                        key={opt.id}
-                        value={opt.size}
-                        disabled={opt.status === "OUT_OF_STOCK"}
-                        className={
-                          opt.status === "OUT_OF_STOCK"
-                            ? "opacity-40 cursor-not-allowed"
-                            : ""
-                        }
-                      >
-                        {opt.size}{" "}
-                        {opt.status === "OUT_OF_STOCK" ? "(Out of Stock)" : ""}
+        {product?.status !== "OUT_OF_STOCK"
+          ? !loading && (
+              <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-2 relative">
+                  <label
+                    htmlFor="size-select"
+                    className={`font-medium ${sizeError && "text-[#CD3626]"}`}
+                  >
+                    {sizeError ? "Please Select A Size" : "Size"}
+                  </label>
+                  <select
+                    id="size-select"
+                    className="border text-[1.1rem] text-black/75 border-black/75 p-3 pr-10 rounded w-full appearance-none focus:outline-none focus:ring-0"
+                    onChange={(e) => {
+                      const value = e.target.value;
+
+                      if (value === "Select Size") {
+                        setSize({ id: 0, size: "Select Size" });
+                        return;
+                      }
+
+                      const selectedSize = product?.sizeOptions.find(
+                        (opt) => opt.size === value
+                      );
+                      if (selectedSize) {
+                        setSize(selectedSize);
+                      }
+                    }}
+                    aria-label="Select product size"
+                  >
+                    {product?.sizeOptions?.length === 1 ? (
+                      <option value={product.sizeOptions[0].size}>
+                        {product.sizeOptions[0].size}
                       </option>
-                    ))}
-                  </>
-                )}
-              </select>
-              <Image
-                src="/icons/right-arrow.svg"
-                width={16}
-                height={16}
-                alt=""
-                aria-hidden="true"
-                className="pointer-events-none absolute top-2/3 right-4 transform -translate-y-1/2"
-              />
-            </div>
+                    ) : (
+                      <>
+                        <option value="Select Size">Select Size</option>
+                        {product?.sizeOptions.map((opt) => (
+                          <option
+                            key={opt.id}
+                            value={opt.size}
+                            disabled={opt.status === "OUT_OF_STOCK"}
+                            className={
+                              opt.status === "OUT_OF_STOCK"
+                                ? "opacity-40 cursor-not-allowed"
+                                : ""
+                            }
+                          >
+                            {opt.size}{" "}
+                            {opt.status === "OUT_OF_STOCK"
+                              ? "(Out of Stock)"
+                              : ""}
+                          </option>
+                        ))}
+                      </>
+                    )}
+                  </select>
+                  <Image
+                    src="/icons/right-arrow.svg"
+                    width={16}
+                    height={16}
+                    alt=""
+                    aria-hidden="true"
+                    className="pointer-events-none absolute top-2/3 right-4 transform -translate-y-1/2"
+                  />
+                </div>
 
-            <div className="flex flex-wrap gap-6 items-center">
-              <Quantity setNumber={setQuantity} number={quantity} />
-              <Button primary={true} action={toggleSubmit}>
-                Add to cart
-              </Button>
-            </div>
-          </div>
-        ) : !loading && (
-          <div className="flex flex-col gap-3">
-            <label
-              htmlFor="email"
-              className={`${errors.email ? "text-[#CD3626]" : ""}`}
-            >
-              {errors.email ? errors.email : "Notify me when it’s back"}
-            </label>
-            <div className="flex gap-3 items-center">
-              <div className="w-full max-w-[248px]">
-                <Input
-                  id="email"
-                  name="email"
-                  value={restockNotification}
-                  action={(e) => HandleRestockNotificationChange(e)}
-                  placeholder="Email"
-                  required={true}
-                />
+                <div className="flex flex-wrap gap-6 items-center">
+                  <Quantity
+                    setNumber={setQuantity}
+                    number={quantity}
+                    maxQuantity={maxQuantity}
+                  />
+                  <Button primary={true} action={toggleSubmit}>
+                    Add to cart
+                  </Button>
+                </div>
               </div>
-              <Button primary={false} action={ToggleRestockNotification}>
-                {restockLoading ? "...Loading" : "Notify Me"}
-              </Button>
-            </div>
-          </div>
-        )}
+            )
+          : !loading && (
+              <div className="flex flex-col gap-3">
+                <label
+                  htmlFor="email"
+                  className={`${errors.email ? "text-[#CD3626]" : ""}`}
+                >
+                  {errors.email ? errors.email : "Notify me when it’s back"}
+                </label>
+                <div className="flex gap-3 items-center">
+                  <div className="w-full max-w-[248px]">
+                    <Input
+                      id="email"
+                      name="email"
+                      value={restockNotification}
+                      action={(e) => HandleRestockNotificationChange(e)}
+                      placeholder="Email"
+                      required={true}
+                    />
+                  </div>
+                  <Button primary={false} action={ToggleRestockNotification}>
+                    {restockLoading ? "...Loading" : "Notify Me"}
+                  </Button>
+                </div>
+              </div>
+            )}
       </div>
-
 
       {modal && (
         <div

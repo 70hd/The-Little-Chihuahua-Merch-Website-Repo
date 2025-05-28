@@ -104,6 +104,7 @@ const QuickAdd = ({
     );
   }
 
+
   return (
     <div
       className="absolute  bottom-2  left-2 right-2  z- cursor-pointer"

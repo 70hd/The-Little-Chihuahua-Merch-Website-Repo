@@ -32,8 +32,8 @@ const initialShipping = {
 };
 
 const CheckoutPageFunc = ({ amount }: { amount: number }) => {
-    const { cartItems } = useCart();
-  const { ship,time,location } = useContext(PickupContext);
+  const { cartItems, clearCart } = useCart();
+  const { ship, time, location } = useContext(PickupContext);
   const stripe = useStripe();
   const elements = useElements();
 
@@ -44,46 +44,97 @@ const CheckoutPageFunc = ({ amount }: { amount: number }) => {
   const [errorMessage, setErrorMessage] = useState<string>();
   const [loading, setLoading] = useState(false);
   useEffect(() => {
-console.log(JSON.stringify({
-          orderId: Date.now(),
-          email: userEmail.trim(),
-          firstName: shippingInfo.firstName,
-          lastName: shippingInfo.lastName,
-          amount: convertToSubcurrency(amount),
-          sessionId: "1341daf1d14f",
-          ship: ship,
-          country: shippingInfo.country,
-          
-          state: shippingInfo.state,
-          city: shippingInfo.city,
-          address: shippingInfo.address,
-          postalCode: shippingInfo.postalCode,
-          unitDetails: shippingInfo.unitDetails,
-          location: location,
-          pickupTime:time,
-          OrderItem: cartItems.map((item) => ({
+    console.log(
+      JSON.stringify({
+        orderId: Date.now(),
+        email: userEmail.trim(),
+        firstName: shippingInfo.firstName,
+        lastName: shippingInfo.lastName,
+        amount: convertToSubcurrency(amount),
+        sessionId: "1341daf1d14f",
+        ship: ship,
+        country: shippingInfo.country,
+
+        state: shippingInfo.state,
+        city: shippingInfo.city,
+        address: shippingInfo.address,
+        postalCode: shippingInfo.postalCode,
+        unitDetails: shippingInfo.unitDetails,
+        location: location,
+        pickupTime: time,
+        OrderItem: cartItems.map((item) => ({
           productId: item.id,
           quantity: item.quantity,
           price: item.price,
           id: 2,
           selectedSize: item.size,
           color: item.color,
-        }))})
-        )
-  },[shippingInfo])
+        })),
+      })
+    );
+  }, [shippingInfo]);
+
 
   const handleChange = (key: keyof typeof initialShipping, value: string) =>
     setShippingInfo((prev) => ({ ...prev, [key]: value.trimStart() }));
 
   const shippingFields: ShippingField[] = [
-    { name: "First Name", placeholder: "First Name", value: shippingInfo.firstName, key: "firstName", required: true },
-    { name: "Last Name", placeholder: "Last Name", value: shippingInfo.lastName, key: "lastName", required: true },
-    { name: "Country", placeholder: "Country", value: shippingInfo.country, key: "country", required: true },
-    { name: "Address", placeholder: "Address", value: shippingInfo.address, key: "address", required: true },
-    { name: "Unit Details", placeholder: "Unit Details", value: shippingInfo.unitDetails, key: "unitDetails", required: false },
-    { name: "City", placeholder: "City", value: shippingInfo.city, key: "city", required: true },
-    { name: "State", placeholder: "State", value: shippingInfo.state, key: "state", required: true },
-    { name: "Postal Code", placeholder: "Postal Code", value: shippingInfo.postalCode, key: "postalCode", required: true },
+    {
+      name: "First Name",
+      placeholder: "First Name",
+      value: shippingInfo.firstName,
+      key: "firstName",
+      required: true,
+    },
+    {
+      name: "Last Name",
+      placeholder: "Last Name",
+      value: shippingInfo.lastName,
+      key: "lastName",
+      required: true,
+    },
+    {
+      name: "Country",
+      placeholder: "Country",
+      value: shippingInfo.country,
+      key: "country",
+      required: true,
+    },
+    {
+      name: "Address",
+      placeholder: "Address",
+      value: shippingInfo.address,
+      key: "address",
+      required: true,
+    },
+    {
+      name: "Unit Details",
+      placeholder: "Unit Details",
+      value: shippingInfo.unitDetails,
+      key: "unitDetails",
+      required: false,
+    },
+    {
+      name: "City",
+      placeholder: "City",
+      value: shippingInfo.city,
+      key: "city",
+      required: true,
+    },
+    {
+      name: "State",
+      placeholder: "State",
+      value: shippingInfo.state,
+      key: "state",
+      required: true,
+    },
+    {
+      name: "Postal Code",
+      placeholder: "Postal Code",
+      value: shippingInfo.postalCode,
+      key: "postalCode",
+      required: true,
+    },
   ];
 
   const groupedFields = [
@@ -94,7 +145,8 @@ console.log(JSON.stringify({
   ];
 
   // Email format validation
-  const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const isValidEmail = (email: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   // Validate form fields
   const validateForm = () => {
@@ -127,28 +179,30 @@ console.log(JSON.stringify({
     if (!validateForm()) return;
 
     setLoading(true);
-    console.log(JSON.stringify({
-          amount: convertToSubcurrency(amount),
-          email: userEmail.trim(),
-          firstName: shippingInfo.firstName,
-          lastName: shippingInfo.lastName,
-          country: shippingInfo.country,
-          address: shippingInfo.address,
-          unitDetails: shippingInfo.unitDetails,
-          city: shippingInfo.city,
-          state: shippingInfo.state,
-          postalCode: shippingInfo.postalCode,
-          location: location,
-          time:time,
-          ship: ship,
-            products: cartItems.map((item) => ({
+    console.log(
+      JSON.stringify({
+        amount: convertToSubcurrency(amount),
+        email: userEmail.trim(),
+        firstName: shippingInfo.firstName,
+        lastName: shippingInfo.lastName,
+        country: shippingInfo.country,
+        address: shippingInfo.address,
+        unitDetails: shippingInfo.unitDetails,
+        city: shippingInfo.city,
+        state: shippingInfo.state,
+        postalCode: shippingInfo.postalCode,
+        location: location,
+        time: time,
+        ship: ship,
+        products: cartItems.map((item) => ({
           productId: item.id,
           quantity: item.quantity,
           price: item.price,
           selectedSize: item.size,
           color: item.color,
-        }))})
-        )
+        })),
+      })
+    );
 
     let secret = clientSecret;
     if (!secret) {
@@ -168,10 +222,9 @@ console.log(JSON.stringify({
           state: shippingInfo.state,
           postalCode: shippingInfo.postalCode,
           location: location,
-          time:time,
+          time: time,
           ship: ship,
-          items: JSON.stringify(cartItems)
-          
+          items: JSON.stringify(cartItems),
         }),
       });
       const data = await res.json();
@@ -198,7 +251,14 @@ console.log(JSON.stringify({
     if (error) {
       setErrorMessage(error.message);
     } else if (paymentIntent?.status === "succeeded") {
-     window.location.href = `${window.location.origin}/payment-success?payment_intent=${paymentIntent.id}&order_id=ORD-${Date.now()}`;
+      const changeInventory = await fetch("/api/change-inventory", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cartItems }),
+      });
+
+
+      clearCart()
     } else {
       setErrorMessage("Payment was not completed.");
     }
@@ -207,9 +267,15 @@ console.log(JSON.stringify({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white flex flex-col gap-[30px] min-w-[392px]">
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white flex flex-col gap-[30px] min-w-[392px]"
+    >
       {/* Contact Info */}
-      <section className="p-12 flex flex-col gap-6 bg-black/5" aria-labelledby="contact-info">
+      <section
+        className="p-12 flex flex-col gap-6 bg-black/5"
+        aria-labelledby="contact-info"
+      >
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 text-white bg-[#221E1F] rounded-full flex items-center justify-center">
             <span>1</span>
@@ -234,7 +300,10 @@ console.log(JSON.stringify({
 
       {/* Shipping Info */}
       {ship && (
-        <section className="p-12 flex flex-col gap-6 bg-black/5" aria-labelledby="shipping-info">
+        <section
+          className="p-12 flex flex-col gap-6 bg-black/5"
+          aria-labelledby="shipping-info"
+        >
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 text-white bg-[#221E1F]  rounded-full flex items-center justify-center">
               <span>2</span>
@@ -243,11 +312,17 @@ console.log(JSON.stringify({
           </div>
           <div className="flex flex-col gap-6">
             {groupedFields.map((group, rowIdx) => (
-              <div key={rowIdx} className="flex gap-[30px] w-full flex-col md:flex-row">
+              <div
+                key={rowIdx}
+                className="flex gap-[30px] w-full flex-col md:flex-row"
+              >
                 {group.map((field) => (
                   <div key={field.key} className="w-full flex flex-col gap-3">
                     <label htmlFor={field.key}>
-                      {field.name} {field.required && <span className="text-[#CD3626]"> *</span>}
+                      {field.name}{" "}
+                      {field.required && (
+                        <span className="text-[#CD3626]"> *</span>
+                      )}
                     </label>
                     <Input
                       id={field.key}
@@ -266,7 +341,10 @@ console.log(JSON.stringify({
       )}
 
       {/* Payment Info */}
-      <section className="p-12 flex flex-col gap-6 bg-black/5" aria-labelledby="express-checkout">
+      <section
+        className="p-12 flex flex-col gap-6 bg-black/5"
+        aria-labelledby="express-checkout"
+      >
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 text-white bg-[#221E1F]  rounded-full flex items-center justify-center">
             <span>{ship ? 3 : 2}</span>

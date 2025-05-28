@@ -6,6 +6,9 @@ type PriceOption = {
 };
 
 type SizeOption = {
+  status: string;
+  id: number;
+  inventory: number;
   size: string;
   availability: boolean;
 };

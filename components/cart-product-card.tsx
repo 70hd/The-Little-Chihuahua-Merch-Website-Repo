@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Quantity from "./quantity";
 import { CldImage } from "next-cloudinary";
 import Link from "next/link";
+import { useGetProducts } from "@/hooks/use-get-products";
 
 type Product = {
   id: number;
@@ -26,6 +27,13 @@ const CartProductCard = ({
   onRemove,
   onUpdateQuantity,
 }: CartProductCardProps) => {
+const [loading, products, error] = useGetProducts();
+const currentProduct = products?.find((p) => p.id === product.id);
+
+const currentSize = currentProduct?.sizeOptions?.find(
+  (size) => size.size === product.size
+);
+
   const [hover, setHover] = useState(false);
   const [quantity, setQuantity] = useState(product.quantity);
   useEffect(() => {
@@ -78,7 +86,7 @@ const CartProductCard = ({
         </div>
         <div className="w-full h-fit flex flex-col gap-[6px]">
           <h5>${product.price}</h5>
-          <Quantity number={quantity} setNumber={setQuantity} />
+          <Quantity number={quantity} setNumber={setQuantity} maxQuantity={currentSize?.inventory}/>
         </div>
       </div>
     </article>

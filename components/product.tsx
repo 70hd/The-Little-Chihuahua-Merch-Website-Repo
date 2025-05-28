@@ -11,6 +11,7 @@ type ProductProps = {
   status: string;
   size: string | string[];
   loading: boolean;
+fullSize: { size: string; productId: number; id: number; inventory: number; status: string; }[]
 };
 
 type SizeObject = {
@@ -29,6 +30,7 @@ const Product = ({
   price,
   status,
   alt,
+  fullSize
 }: ProductProps) => {
   const [hover, setHover] = useState(false);
   const [cartModal, setCartModal] = useState(false);
@@ -38,26 +40,7 @@ const Product = ({
     .toLowerCase()
     .replace(/^./, (c) => c.toUpperCase());
   const dynamicImage = hover ? 1 : 0;
-
-  const normalizedSizes: SizeObject[] = Array.isArray(size)
-    ? size.length > 0 && typeof size[0] === "object"
-      ? (size as unknown as SizeObject[])
-      : (size as string[]).map((s, i) => ({
-          size: s,
-          productId: image?.[0]?.productId ?? 0,
-          id: i,
-          inventory: 1,
-          status: status,
-        }))
-    : [
-        {
-          size: typeof size === "string" ? size : "",
-          productId: image?.[0]?.productId ?? 0,
-          id: 0,
-          inventory: 1,
-          status: status,
-        },
-      ];
+    
 
   return (
     <article aria-label={`Product: ${title}`} className="relative">
@@ -90,7 +73,7 @@ const Product = ({
                 setCartModal={setCartModal}
                 cartModal={cartModal}
                 hover={hover}
-                size={normalizedSizes}
+                size={fullSize}
                 setHover={setHover}
               />
             </div>

@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
       const payload = {
         ...orderData,
         products: items.map((item) => ({
-          productId: item.id,
+          productId: Number(item.id),
           quantity: item.quantity,
           price: item.price,
           selectedSize: item.size,

@@ -10,13 +10,16 @@ interface PriceOption {
   price: number;
 }
 
-interface SizeOption {
-  id?: number;
+// /types.ts
+export interface SizeOption {
+  id: number;
+  productId: number;
   size: string;
-  status?: string;
+  inventory: number;
+  status: string;
 }
 
-interface ProductType {
+export interface ProductType {
   id: number;
   title: string;
   description: string;
@@ -31,9 +34,23 @@ export default function Home() {
   const [finalProducts, setFinalProducts] = useState<ProductType[]>([]);
   const [loading, products, error] = useGetProducts();
 
-  useEffect(() => {
-    setFinalProducts(Array.isArray(products) ? products : []);
-  }, [loading, products, error]);
+useEffect(() => {
+  if (Array.isArray(products)) {
+    const normalized = products.map((p) => ({
+      ...p,
+      sizeOptions: p.sizeOptions.map((so) => ({
+        id: so.id ?? 0,                  // provide default or actual value
+        productId: p.id,                 // assign parent productId
+        size: so.size,
+        inventory: so.inventory ?? 0,    // default inventory if missing
+        status: so.status ?? "unknown", // default status if missing
+      })),
+    }));
+    setFinalProducts(normalized);
+  } else {
+    setFinalProducts([]);
+  }
+}, [loading, products, error]);
 
   return (
     <main className="flex flex-col gap-[30px] overflow-hidden">
@@ -91,6 +108,7 @@ export default function Home() {
                 }
                 alt="custom alt"
                 size={product.sizeOptions.map((opt) => opt.size)}
+                fullSize={product.sizeOptions}
                 loading={loading}
               />
             ))

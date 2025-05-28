@@ -1,44 +1,57 @@
+"use client";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect } from "react";
 
 type ToggleSumChangeProps = {
   number: number;
   setNumber: React.Dispatch<React.SetStateAction<number>>;
+  maxQuantity?: number;
 };
 
-const Quantity = ({ number, setNumber }: ToggleSumChangeProps) => {
+const Quantity = ({ number, setNumber, maxQuantity = 100 }: ToggleSumChangeProps) => {
+  useEffect(() => {
+    if (number > maxQuantity) {
+      setNumber(maxQuantity);
+    }
+  }, [maxQuantity]);
+
   const handleChange = (action: "increment" | "decrement") => {
-    setNumber((prev) =>
-      action === "increment" ? prev + 1 : Math.max(prev - 1, 1)
-    );
+    setNumber((prev) => {
+      const newVal = action === "increment" ? prev + 1 : Math.max(prev - 1, 1);
+      return Math.min(newVal, maxQuantity);
+    });
   };
-  type UpdateSumProps = {
+
+  const UpdateSum = ({
+    src,
+    onClick,
+    label,
+  }: {
     src: string;
     onClick: () => void;
     label: string;
+  }) => {
+    const isDisabled =
+      (number === 1 && label.includes("Decrease")) ||
+      (number >= maxQuantity && label.includes("Increase"));
+
+    return (
+      <button
+        type="button"
+        onClick={!isDisabled ? onClick : undefined}
+        aria-label={label}
+        className={isDisabled ? "cursor-not-allowed" : "cursor-pointer"}
+      >
+        <Image
+          src={src}
+          width={20}
+          height={20}
+          alt={label}
+          className="min-w-[20px] max-w-[20px]"
+        />
+      </button>
+    );
   };
-  const UpdateSum = ({ src, onClick, label }: UpdateSumProps) => (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label={label}
-      className={`${
-        number === 1 && src.toLowerCase().includes("minus")
-          ? "cursor-not-allowed"
-          : "cursor-pointer"
-      }`}
-    >
-      <Image
-        src={src}
-        width={20}
-        height={20}
-        alt={`A ${
-          src.toLowerCase().includes("plus") ? "plus" : "minus"
-        } icon used to adjust the quantity number`}
-        className="min-w-[20px] max-w-[20px]"
-      />
-    </button>
-  );
 
   return (
     <div className="w-fit h-fit flex gap-6 items-center p-[1.2rem] border border-[221E1F]/50">
