@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
     //   })),
     // });
 
-    Step 3: Notify Zapier
+ 
     if (zapierWebhookUrl) {
       const payload = {
         ...orderData,
