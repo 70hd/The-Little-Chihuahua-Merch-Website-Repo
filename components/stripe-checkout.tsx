@@ -273,7 +273,7 @@ const CheckoutPageFunc: React.FC<CheckoutPageProps> = ({ amount, price }) => {
       });
 
       clearCart()
-            window.location.href = `${window.location.origin}/payment-success?payment_intent=${paymentIntent.id}?order_id=${Date.now()}`;
+window.location.href = `${window.location.origin}/payment-success?payment_intent=${paymentIntent.id}&order_id=${Date.now()}`;
     } else {
       setErrorMessage("Payment was not completed.");
     }
