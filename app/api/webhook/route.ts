@@ -7,7 +7,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 const prisma = new PrismaClient();
 
-const googleSheetsOrderWebhookUrl = process.env.GOOGLE_SHEETS_WEBHOOK_URL;
+const googleSheetsOrderWebhookUrl = process.env.TEST_WEBHOOK;
 
 async function buffer(readable: ReadableStream<Uint8Array>): Promise<Buffer> {
   const reader = readable.getReader();
