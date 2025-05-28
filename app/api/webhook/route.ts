@@ -82,6 +82,21 @@ export async function POST(req: NextRequest) {
     pickupTime: !ship ? intent.metadata.time || null : null,
   };
 
+  const payload = {
+    ...orderData,
+    orderTotal: intent.metadata.orderTotal,
+    taxes: intent.metadata.taxes,
+    subtotal: intent.metadata.subtotal,
+    shippingFee: intent.metadata.shippingFee,
+    productsOrdered: items.map((item) => ({
+      productName: item.title,
+      quantity: item.quantity,
+      price: item.price,
+      selectedSize: item.size,
+      color: item.color,
+    })),
+  };
+
   try {
     const createdOrder = await prisma.order.create({ data: orderData });
 
@@ -96,34 +111,13 @@ export async function POST(req: NextRequest) {
       })),
     });
 
-    const payload = {
-      ...orderData,
-      orderTotal: intent.metadata.orderTotal,
-      taxes: intent.metadata.taxes,
-      subtotal: intent.metadata.subtotal,
-      shippingFee: intent.metadata.shippingFee,
-      productsOrdered: items.map((item) => ({
-        productName: item.title,
-        quantity: item.quantity,
-        price: item.price,
-        selectedSize: item.size,
-        color: item.color,
-      })),
-    };
-
-try {
-  await sendToZapier(zapierWebhookUrl, "Webhook 1", payload);
-} catch (err) {
-  console.error("❌ Webhook 1 threw error:", err);
-}
-
-try {
-  await sendToZapier(zapierOrderWebhookUrl, "Webhook 2", payload);
-} catch (err) {
-  console.error("❌ Webhook 2 threw error:", err);
-}
+    // Send each webhook in its own try-catch for full reliability
+    await Promise.all([
+      sendToZapier(zapierWebhookUrl, "Zapier Webhook 1", payload),
+      sendToZapier(zapierOrderWebhookUrl, "Zapier Webhook 2", payload),
+    ]);
   } catch (err: any) {
-    console.error("❌ Order handling failed:", err);
+    console.error("❌ Order processing failed:", err);
     return new Response("Internal error", { status: 500 });
   } finally {
     await prisma.$disconnect();
@@ -133,20 +127,26 @@ try {
 }
 
 async function sendToZapier(url: string | undefined, label: string, payload: object) {
-  if (!url) return;
+  if (!url) {
+    console.warn(`⚠️ ${label} skipped — no URL defined.`);
+    return;
+  }
 
+  console.log(`📡 Sending to ${label}: ${url}`);
   try {
     const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
+
     const text = await res.text();
-    console.log(`🔔 ${label} response:`, res.status, text);
+    console.log(`🔔 ${label} response [${res.status}]: ${text}`);
+
     if (!res.ok) {
-      console.error(`❌ ${label} failed:`, res.statusText);
+      console.error(`❌ ${label} failed with status:`, res.statusText);
     }
   } catch (err) {
-    console.error(`❌ ${label} error:`, err);
+    console.error(`❌ ${label} network error:`, err);
   }
 }
