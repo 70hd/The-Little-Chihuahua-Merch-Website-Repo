@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
   const ship = intent.metadata.ship === "true";
   const orderData = {
     orderId,
-    email: intent.receipt_email || "no-email",
+  email: intent.metadata.email || intent.receipt_email || "no-email",
     firstName: ship ? intent.metadata.firstName || null : null,
     lastName: ship ? intent.metadata.lastName || null : null,
     amount: (intent.amount || 0) / 100,
@@ -121,10 +121,14 @@ export async function POST(req: NextRequest) {
         console.error("Zapier webhook failed:", res.statusText);
       }
     }
-  } catch (err: any) {
-    console.error("❌ Error handling order:", err.message || err);
-    return new Response("Internal error", { status: 500 });
-  } finally {
+} catch (err: any) {
+  console.error("❌ Error handling order:", err);
+  if (err instanceof Error) {
+    console.error("Message:", err.message);
+    console.error("Stack:", err.stack);
+  }
+  return new Response("Internal error", { status: 500 });
+} finally {
     await prisma.$disconnect();
   }
 
