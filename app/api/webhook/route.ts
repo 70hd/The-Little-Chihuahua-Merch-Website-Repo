@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
   try {
     event = stripe.webhooks.constructEvent(rawBody, signature, endpointSecret);
   } catch (err) {
-    console.error("Invalid Stripe signature:", err);
+    console.error("❌ Invalid Stripe signature:", err);
     return new Response("Invalid Stripe signature", { status: 400 });
   }
 
@@ -54,13 +54,14 @@ export async function POST(req: NextRequest) {
   try {
     items = JSON.parse(intent.metadata.items || "[]");
   } catch {
-    console.warn("Failed to parse items JSON");
+    console.warn("⚠️ Failed to parse items JSON:", intent.metadata.items);
+    return new Response("Invalid items format", { status: 400 });
   }
 
   const ship = intent.metadata.ship === "true";
   const orderData = {
     orderId,
-  email: intent.metadata.email || intent.receipt_email || "no-email",
+    email: intent.metadata.email || intent.receipt_email || "no-email",
     firstName: ship ? intent.metadata.firstName || null : null,
     lastName: ship ? intent.metadata.lastName || null : null,
     amount: (intent.amount || 0) / 100,
@@ -81,26 +82,29 @@ export async function POST(req: NextRequest) {
   };
 
   try {
-    await prisma.order.create({
-      data: {
-        ...orderData,
-        OrderItem: {
-          create: items.map((item) => ({
-            productId: item.id,
-            quantity: item.quantity,
-            price: item.price,
-            selectedSize: item.size,
-            color: item.color,
-          })),
-        },
-      },
+    // Step 1: Create the order
+    const createdOrder = await prisma.order.create({
+      data: orderData,
     });
 
+    // Step 2: Create order items (with foreign key to order)
+    await prisma.orderItem.createMany({
+      data: items.map((item) => ({
+        orderId: createdOrder.id,
+        productId: item.id,
+        quantity: item.quantity,
+        price: item.price,
+        selectedSize: item.size,
+        color: item.color,
+      })),
+    });
+
+    // Step 3: Notify Zapier
     if (zapierWebhookUrl) {
       const payload = {
         ...orderData,
         productsOrdered: items.map((item) => ({
-          productName: item.title, // fixed from item.name
+          productName: item.title,
           quantity: item.quantity,
           price: item.price,
           selectedSize: item.size,
@@ -108,29 +112,33 @@ export async function POST(req: NextRequest) {
         })),
       };
 
-      const res = await fetch(zapierWebhookUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      try {
+        const res = await fetch(zapierWebhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
 
-      const responseText = await res.text();
-      console.log("Zapier response:", res.status, responseText);
+        const responseText = await res.text();
+        console.log("🔔 Zapier response:", res.status, responseText);
 
-      if (!res.ok) {
-        console.error("Zapier webhook failed:", res.statusText);
+        if (!res.ok) {
+          console.error("❌ Zapier webhook failed:", res.statusText);
+        }
+      } catch (zapierError) {
+        console.error("❌ Failed to send to Zapier:", zapierError);
       }
     }
-} catch (err: any) {
-  console.error("❌ Error handling order:", err);
-  if (err instanceof Error) {
-    console.error("Message:", err.message);
-    console.error("Stack:", err.stack);
-  }
-  return new Response("Internal error", { status: 500 });
-} finally {
+  } catch (err: any) {
+    console.error("❌ Error handling order:", err);
+    if (err instanceof Error) {
+      console.error("Message:", err.message);
+      console.error("Stack:", err.stack);
+    }
+    return new Response("Internal error", { status: 500 });
+  } finally {
     await prisma.$disconnect();
   }
 
-  return new Response("Order processed", { status: 200 });
+  return new Response("✅ Order processed", { status: 200 });
 }

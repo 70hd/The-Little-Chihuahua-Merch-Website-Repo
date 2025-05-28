@@ -235,7 +235,7 @@ const CheckoutPageFunc: React.FC<CheckoutPageProps> = ({ amount, price }) => {
           location: location,
           time: time,
           ship: ship,
-          items: JSON.stringify(cartItems),
+          items: cartItems,
           estimatedOrderTotal: price.estimatedOrderTotal,
           estimatedTaxes: price.estimatedTaxes,
           subtotal: price.subtotal,
