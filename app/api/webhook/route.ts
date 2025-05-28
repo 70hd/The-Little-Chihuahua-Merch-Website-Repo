@@ -7,7 +7,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 const prisma = new PrismaClient();
 const zapierWebhookUrl = process.env.ZAPIER_WEBHOOK_URL;
-const zapierOrderWebhookUrl = process.env.ZAPIER_ORDER_URL;
+const zapierOrderWebhookUrl = process.env.ZAPIER_ORDER_URL
 
 async function buffer(readable: ReadableStream<Uint8Array>): Promise<Buffer> {
   const reader = readable.getReader();
@@ -50,6 +50,7 @@ export async function POST(req: NextRequest) {
 
   const intent = event.data.object as Stripe.PaymentIntent;
 
+
   let items: any[] = [];
   try {
     items = JSON.parse(intent.metadata.items || "[]");
@@ -78,6 +79,7 @@ export async function POST(req: NextRequest) {
   };
 
   try {
+  
     const createdOrder = await prisma.order.create({
       data: orderData,
     });
@@ -94,13 +96,14 @@ export async function POST(req: NextRequest) {
       })),
     });
 
-    if (zapierWebhookUrl && zapierOrderWebhookUrl) {
+ 
+    if (zapierWebhookUrl )  {
       const payload = {
         ...orderData,
-        orderTotal: intent.metadata.orderTotal,
-        taxes: intent.metadata.taxes,
-        subtotal: intent.metadata.subtotal,
-        shippingFee: intent.metadata.shippingFee,
+            orderTotal: intent.metadata.orderTotal,
+    taxes: intent.metadata.taxes,
+    subtotal: intent.metadata.subtotal,
+    shippingFee: intent.metadata.shippingFee,
         productsOrdered: items.map((item) => ({
           productName: item.title,
           quantity: item.quantity,
@@ -111,18 +114,18 @@ export async function POST(req: NextRequest) {
       };
 
       try {
-        await Promise.all([
-          fetch(zapierWebhookUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          }),
-          fetch(zapierOrderWebhookUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          }),
-        ]);
+        const res = await fetch(zapierWebhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        const responseText = await res.text();
+        console.log("🔔 Zapier response:", res.status, responseText);
+
+        if (!res.ok) {
+          console.error("❌ Zapier webhook failed:", res.statusText);
+        }
       } catch (zapierError) {
         console.error("❌ Failed to send to Zapier:", zapierError);
       }
