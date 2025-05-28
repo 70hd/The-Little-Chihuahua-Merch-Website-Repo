@@ -99,36 +99,36 @@ export async function POST(req: NextRequest) {
     //   })),
     // });
 
-    // Step 3: Notify Zapier
-    // if (zapierWebhookUrl) {
-    //   const payload = {
-    //     ...orderData,
-    //     productsOrdered: items.map((item) => ({
-    //       productName: item.title,
-    //       quantity: item.quantity,
-    //       price: item.price,
-    //       selectedSize: item.size,
-    //       color: item.color,
-    //     })),
-    //   };
+    Step 3: Notify Zapier
+    if (zapierWebhookUrl) {
+      const payload = {
+        ...orderData,
+        productsOrdered: items.map((item) => ({
+          productName: item.title,
+          quantity: item.quantity,
+          price: item.price,
+          selectedSize: item.size,
+          color: item.color,
+        })),
+      };
 
-    //   try {
-    //     const res = await fetch(zapierWebhookUrl, {
-    //       method: "POST",
-    //       headers: { "Content-Type": "application/json" },
-    //       body: JSON.stringify(payload),
-    //     });
+      try {
+        const res = await fetch(zapierWebhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
 
-    //     const responseText = await res.text();
-    //     console.log("🔔 Zapier response:", res.status, responseText);
+        const responseText = await res.text();
+        console.log("🔔 Zapier response:", res.status, responseText);
 
-    //     if (!res.ok) {
-    //       console.error("❌ Zapier webhook failed:", res.statusText);
-    //     }
-    //   } catch (zapierError) {
-    //     console.error("❌ Failed to send to Zapier:", zapierError);
-    //   }
-    // }
+        if (!res.ok) {
+          console.error("❌ Zapier webhook failed:", res.statusText);
+        }
+      } catch (zapierError) {
+        console.error("❌ Failed to send to Zapier:", zapierError);
+      }
+    }
   } catch (err: any) {
     console.error("❌ Error handling order:", err);
     if (err instanceof Error) {
