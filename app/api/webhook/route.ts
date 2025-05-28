@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
     // Step 2: Create order items (with foreign key to order)
     await prisma.orderItem.createMany({
       data: items.map((item) => ({
-        orderId: createdOrder.id,
+        orderId: Date.now(),
         productId: item.id,
         quantity: item.quantity,
         price: item.price,
