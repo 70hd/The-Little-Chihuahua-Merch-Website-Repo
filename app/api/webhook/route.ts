@@ -82,10 +82,10 @@ export async function POST(req: NextRequest) {
   };
 
   try {
-    // Step 1: Create the order
-    // const createdOrder = await prisma.order.create({
-    //   data: orderData,
-    // });
+    Step 1: Create the order
+    const createdOrder = await prisma.order.create({
+      data: orderData,
+    });
 
     // Step 2: Create order items (with foreign key to order)
     // await prisma.orderItem.createMany({
