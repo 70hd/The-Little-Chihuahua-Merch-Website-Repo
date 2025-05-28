@@ -6,8 +6,10 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-04-30.basil",
 });
 const prisma = new PrismaClient();
+
 const zapierWebhookUrl = process.env.ZAPIER_WEBHOOK_URL;
-const zapierOrderWebhookUrl = process.env.ZAPIER_ORDER_URL
+const zapierOrderWebhookUrl = process.env.ZAPIER_ORDER_URL;
+const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 async function buffer(readable: ReadableStream<Uint8Array>): Promise<Buffer> {
   const reader = readable.getReader();
@@ -21,11 +23,13 @@ async function buffer(readable: ReadableStream<Uint8Array>): Promise<Buffer> {
 }
 
 export async function POST(req: NextRequest) {
-  const signature = req.headers.get("stripe-signature");
-  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!stripeWebhookSecret) {
+    return new Response("Missing Stripe secret", { status: 500 });
+  }
 
-  if (!signature || !endpointSecret) {
-    return new Response("Missing Stripe signature or secret", { status: 400 });
+  const signature = req.headers.get("stripe-signature");
+  if (!signature) {
+    return new Response("Missing Stripe signature", { status: 400 });
   }
 
   let rawBody: Buffer;
@@ -33,15 +37,15 @@ export async function POST(req: NextRequest) {
     if (!req.body) return new Response("Empty request body", { status: 400 });
     rawBody = await buffer(req.body);
   } catch {
-    return new Response("Failed to read request body", { status: 400 });
+    return new Response("Failed to read body", { status: 400 });
   }
 
   let event: Stripe.Event;
   try {
-    event = stripe.webhooks.constructEvent(rawBody, signature, endpointSecret);
+    event = stripe.webhooks.constructEvent(rawBody, signature, stripeWebhookSecret);
   } catch (err) {
     console.error("❌ Invalid Stripe signature:", err);
-    return new Response("Invalid Stripe signature", { status: 400 });
+    return new Response("Invalid signature", { status: 400 });
   }
 
   if (event.type !== "payment_intent.succeeded") {
@@ -50,13 +54,13 @@ export async function POST(req: NextRequest) {
 
   const intent = event.data.object as Stripe.PaymentIntent;
 
-
+  // Parse metadata
   let items: any[] = [];
   try {
     items = JSON.parse(intent.metadata.items || "[]");
   } catch {
-    console.warn("⚠️ Failed to parse items JSON:", intent.metadata.items);
-    return new Response("Invalid items format", { status: 400 });
+    console.warn("⚠️ Could not parse items:", intent.metadata.items);
+    return new Response("Invalid items JSON", { status: 400 });
   }
 
   const ship = intent.metadata.ship === "true";
@@ -67,7 +71,7 @@ export async function POST(req: NextRequest) {
     lastName: ship ? intent.metadata.lastName || null : null,
     amount: (intent.amount || 0) / 100,
     sessionId: intent.id,
-    ship: ship ? true : intent.metadata.ship === "false" ? false : null,
+    ship,
     country: ship ? intent.metadata.country || null : null,
     state: ship ? intent.metadata.state || null : null,
     city: ship ? intent.metadata.city || null : null,
@@ -79,12 +83,8 @@ export async function POST(req: NextRequest) {
   };
 
   try {
-  
-    const createdOrder = await prisma.order.create({
-      data: orderData,
-    });
+    const createdOrder = await prisma.order.create({ data: orderData });
 
-    // Step 2: Create order items (with foreign key to order)
     await prisma.orderItem.createMany({
       data: items.map((item) => ({
         orderId: createdOrder.id,
@@ -96,50 +96,48 @@ export async function POST(req: NextRequest) {
       })),
     });
 
- 
-    if (zapierWebhookUrl )  {
-      const payload = {
-        ...orderData,
-            orderTotal: intent.metadata.orderTotal,
-    taxes: intent.metadata.taxes,
-    subtotal: intent.metadata.subtotal,
-    shippingFee: intent.metadata.shippingFee,
-        productsOrdered: items.map((item) => ({
-          productName: item.title,
-          quantity: item.quantity,
-          price: item.price,
-          selectedSize: item.size,
-          color: item.color,
-        })),
-      };
+    const payload = {
+      ...orderData,
+      orderTotal: intent.metadata.orderTotal,
+      taxes: intent.metadata.taxes,
+      subtotal: intent.metadata.subtotal,
+      shippingFee: intent.metadata.shippingFee,
+      productsOrdered: items.map((item) => ({
+        productName: item.title,
+        quantity: item.quantity,
+        price: item.price,
+        selectedSize: item.size,
+        color: item.color,
+      })),
+    };
 
-      try {
-        const res = await fetch(zapierWebhookUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-
-        const responseText = await res.text();
-        console.log("🔔 Zapier response:", res.status, responseText);
-
-        if (!res.ok) {
-          console.error("❌ Zapier webhook failed:", res.statusText);
-        }
-      } catch (zapierError) {
-        console.error("❌ Failed to send to Zapier:", zapierError);
-      }
-    }
+    await sendToZapier(zapierWebhookUrl, "Webhook 1", payload);
+    await sendToZapier(zapierOrderWebhookUrl, "Webhook 2", payload);
   } catch (err: any) {
-    console.error("❌ Error handling order:", err);
-    if (err instanceof Error) {
-      console.error("Message:", err.message);
-      console.error("Stack:", err.stack);
-    }
+    console.error("❌ Order handling failed:", err);
     return new Response("Internal error", { status: 500 });
   } finally {
     await prisma.$disconnect();
   }
 
   return new Response("✅ Order processed", { status: 200 });
+}
+
+async function sendToZapier(url: string | undefined, label: string, payload: object) {
+  if (!url) return;
+
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const text = await res.text();
+    console.log(`🔔 ${label} response:`, res.status, text);
+    if (!res.ok) {
+      console.error(`❌ ${label} failed:`, res.statusText);
+    }
+  } catch (err) {
+    console.error(`❌ ${label} error:`, err);
+  }
 }
