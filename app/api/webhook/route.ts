@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
       })),
     };
 
-    await sendToZapier(zapierWebhookUrl, "Webhook 1", payload);
+    // await sendToZapier(zapierWebhookUrl, "Webhook 1", payload);
     await sendToZapier(zapierOrderWebhookUrl, "Webhook 2", payload);
   } catch (err: any) {
     console.error("❌ Order handling failed:", err);
