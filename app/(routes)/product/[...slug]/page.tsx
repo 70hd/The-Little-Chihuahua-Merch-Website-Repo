@@ -74,12 +74,6 @@ const ProductPage = () => {
       setMaxQuantity(100);
     }
   }, [size]);
-  useEffect(() => {
-    console.log(maxQuantity);
-  }, [maxQuantity]);
-  useEffect(() => {
-    console.log(size);
-  }, [size]);
   const ToggleRestockNotification = async () => {
     setRestockLoading(true);
 
