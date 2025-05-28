@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
   };
 
   try {
-    Step 1: Create the order
+  
     const createdOrder = await prisma.order.create({
       data: orderData,
     });
