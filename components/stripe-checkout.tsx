@@ -53,6 +53,7 @@ const CheckoutPageFunc: React.FC<CheckoutPageProps> = ({ amount, price }) => {
   const [paymentIntentId, setPaymentIntentId] = useState("");
   const [errorMessage, setErrorMessage] = useState<string>();
   const [loading, setLoading] = useState(false);
+  const orderId = Date.now();
   useEffect(() => {
     console.log(
       JSON.stringify({
@@ -80,11 +81,9 @@ const CheckoutPageFunc: React.FC<CheckoutPageProps> = ({ amount, price }) => {
           selectedSize: item.size,
           color: item.color,
         })),
-
       })
     );
   }, [shippingInfo]);
-
 
   const handleChange = (key: keyof typeof initialShipping, value: string) =>
     setShippingInfo((prev) => ({ ...prev, [key]: value.trimStart() }));
@@ -223,7 +222,7 @@ const CheckoutPageFunc: React.FC<CheckoutPageProps> = ({ amount, price }) => {
         body: JSON.stringify({
           amount: convertToSubcurrency(amount),
           email: userEmail.trim(),
-          // ...shippingInfo,
+          orderId: `ORD-${orderId}`,
           firstName: shippingInfo.firstName,
           lastName: shippingInfo.lastName,
           country: shippingInfo.country,
@@ -272,8 +271,8 @@ const CheckoutPageFunc: React.FC<CheckoutPageProps> = ({ amount, price }) => {
         body: JSON.stringify({ cartItems }),
       });
 
-      clearCart()
-window.location.href = `${window.location.origin}/payment-success?payment_intent=${paymentIntent.id}&order_id=${Date.now()}`;
+      clearCart();
+      window.location.href = `${window.location.origin}/payment-success?payment_intent=${paymentIntent.id}&order_id=${orderId}`;
     } else {
       setErrorMessage("Payment was not completed.");
     }

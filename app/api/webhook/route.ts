@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
   }
 
   const intent = event.data.object as Stripe.PaymentIntent;
-  const orderId = `ORD-${Date.now()}`;
+
 
   let items: any[] = [];
   try {
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
 
   const ship = intent.metadata.ship === "true";
   const orderData = {
-    orderId,
+    orderId: intent.metadata.orderId,
     email: intent.metadata.email || intent.receipt_email || "no-email",
     firstName: ship ? intent.metadata.firstName || null : null,
     lastName: ship ? intent.metadata.lastName || null : null,

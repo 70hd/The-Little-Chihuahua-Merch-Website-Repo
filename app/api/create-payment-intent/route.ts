@@ -25,6 +25,7 @@ export async function POST(request: NextRequest) {
       estimatedOrderTotal,
       estimatedTaxes,
       subtotal,
+      orderId,
       shippingFee,
     } = await request.json();
 
@@ -62,6 +63,7 @@ export async function POST(request: NextRequest) {
       taxes: estimatedTaxes,
       subtotal: subtotal,
       shippingFee: shippingFee,
+      orderId: orderId
     };
 
     const paymentIntent = await stripe.paymentIntents.create({
