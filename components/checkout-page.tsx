@@ -14,8 +14,17 @@ const stripePromise = (() => {
   }
   return loadStripe(key);
 })();
-
-export default function CheckoutPage({ amount }: { amount: number }) {
+type PriceState = {
+  subtotal: number;
+  estimatedTaxes: number;
+  estimatedOrderTotal: number;
+  shippingFee: number;
+};
+interface CheckoutPageProps {
+  amount: number;
+  price: PriceState;
+}
+export default function CheckoutPage({ amount, price }: CheckoutPageProps) {
   const [stripe, setStripe] = useState<Stripe | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -42,7 +51,7 @@ export default function CheckoutPage({ amount }: { amount: number }) {
             currency: "usd",
           }}
         >
-          <CheckoutPageFunc amount={amount}  />
+          <CheckoutPageFunc amount={amount} price={price}  />
         </Elements>
       )}
     </main>
