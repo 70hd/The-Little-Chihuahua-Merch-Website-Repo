@@ -75,22 +75,18 @@ export async function POST(req: NextRequest) {
     unitDetails: ship ? intent.metadata.unitDetails || null : null,
     location: !ship ? intent.metadata.location || null : null,
     pickupTime: !ship ? intent.metadata.time || null : null,
-    orderTotal: intent.metadata.orderTotal,
-    taxes: intent.metadata.taxes,
-    subtotal: intent.metadata.subtotal,
-    shippingFee: intent.metadata.shippingFee,
   };
 
   try {
   
-    // const createdOrder = await prisma.order.create({
-    //   data: orderData,
-    // });
+    const createdOrder = await prisma.order.create({
+      data: orderData,
+    });
 
     // Step 2: Create order items (with foreign key to order)
     await prisma.orderItem.createMany({
       data: items.map((item) => ({
-        orderId: Date.now(),
+        orderId: createdOrder.id,
         productId: item.id,
         quantity: item.quantity,
         price: item.price,
@@ -103,6 +99,10 @@ export async function POST(req: NextRequest) {
     if (zapierWebhookUrl) {
       const payload = {
         ...orderData,
+            orderTotal: intent.metadata.orderTotal,
+    taxes: intent.metadata.taxes,
+    subtotal: intent.metadata.subtotal,
+    shippingFee: intent.metadata.shippingFee,
         productsOrdered: items.map((item) => ({
           productName: item.title,
           quantity: item.quantity,
