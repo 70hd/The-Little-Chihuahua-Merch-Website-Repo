@@ -2,15 +2,18 @@ import { NextRequest } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import Stripe from "stripe";
 
+// Initialize Stripe & Prisma
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-04-30.basil",
 });
 const prisma = new PrismaClient();
 
+// Environment variables
+const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 const zapierWebhookUrl = process.env.ZAPIER_WEBHOOK_URL;
 const zapierOrderWebhookUrl = process.env.ZAPIER_ORDER_URL;
-const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
+// Helper to read raw request body
 async function buffer(readable: ReadableStream<Uint8Array>): Promise<Buffer> {
   const reader = readable.getReader();
   const chunks: Uint8Array[] = [];
@@ -24,18 +27,16 @@ async function buffer(readable: ReadableStream<Uint8Array>): Promise<Buffer> {
 
 export async function POST(req: NextRequest) {
   if (!stripeWebhookSecret) {
+    console.error("❌ Missing STRIPE_WEBHOOK_SECRET");
     return new Response("Missing Stripe secret", { status: 500 });
   }
 
   const signature = req.headers.get("stripe-signature");
-  if (!signature) {
-    return new Response("Missing Stripe signature", { status: 400 });
-  }
+  if (!signature) return new Response("Missing Stripe signature", { status: 400 });
 
   let rawBody: Buffer;
   try {
-    if (!req.body) return new Response("Empty request body", { status: 400 });
-    rawBody = await buffer(req.body);
+    rawBody = await buffer(req.body!);
   } catch {
     return new Response("Failed to read body", { status: 400 });
   }
@@ -49,17 +50,17 @@ export async function POST(req: NextRequest) {
   }
 
   if (event.type !== "payment_intent.succeeded") {
-    return new Response("Event not handled", { status: 200 });
+    return new Response("Unhandled event", { status: 200 });
   }
 
   const intent = event.data.object as Stripe.PaymentIntent;
 
-  // Parse metadata
+  // Parse order metadata
   let items: any[] = [];
   try {
     items = JSON.parse(intent.metadata.items || "[]");
   } catch {
-    console.warn("⚠️ Could not parse items:", intent.metadata.items);
+    console.warn("⚠️ Invalid items JSON:", intent.metadata.items);
     return new Response("Invalid items JSON", { status: 400 });
   }
 
@@ -111,13 +112,18 @@ export async function POST(req: NextRequest) {
       })),
     });
 
-    // Send each webhook in its own try-catch for full reliability
+    // Log loaded URLs
+    console.log("🧪 ZAPIER_WEBHOOK_URL:", zapierWebhookUrl);
+    console.log("🧪 ZAPIER_ORDER_URL:", zapierOrderWebhookUrl);
+
+    // Run webhooks in parallel
     await Promise.all([
       sendToZapier(zapierWebhookUrl, "Zapier Webhook 1", payload),
       sendToZapier(zapierOrderWebhookUrl, "Zapier Webhook 2", payload),
     ]);
-  } catch (err: any) {
-    console.error("❌ Order processing failed:", err);
+
+  } catch (err) {
+    console.error("❌ Failed to process order:", err);
     return new Response("Internal error", { status: 500 });
   } finally {
     await prisma.$disconnect();
@@ -128,7 +134,7 @@ export async function POST(req: NextRequest) {
 
 async function sendToZapier(url: string | undefined, label: string, payload: object) {
   if (!url) {
-    console.warn(`⚠️ ${label} skipped — no URL defined.`);
+    console.warn(`⚠️ ${label} not sent — URL undefined.`);
     return;
   }
 
@@ -141,12 +147,12 @@ async function sendToZapier(url: string | undefined, label: string, payload: obj
     });
 
     const text = await res.text();
-    console.log(`🔔 ${label} response [${res.status}]: ${text}`);
+    console.log(`🔔 ${label} response (${res.status}): ${text}`);
 
     if (!res.ok) {
-      console.error(`❌ ${label} failed with status:`, res.statusText);
+      console.error(`❌ ${label} failed:`, res.statusText);
     }
   } catch (err) {
-    console.error(`❌ ${label} network error:`, err);
+    console.error(`❌ ${label} error:`, err);
   }
 }
