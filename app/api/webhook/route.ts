@@ -7,7 +7,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 const prisma = new PrismaClient();
 
-const googleSheetsOrderWebhookUrl = process.env.TEST_WEBHOOK;
+const zapierWebhookUrl = process.env.ZAPIER_WEBHOOK_URL;
 
 async function buffer(readable: ReadableStream<Uint8Array>): Promise<Buffer> {
   const reader = readable.getReader();
@@ -77,6 +77,10 @@ export async function POST(req: NextRequest) {
     unitDetails: ship ? intent.metadata.unitDetails || null : null,
     location: !ship ? intent.metadata.location || null : null,
     pickupTime: !ship ? intent.metadata.time || null : null,
+    orderTotal: intent.metadata.orderTotal,
+    taxes: intent.metadata.taxes,
+    subtotal: intent.metadata.subtotal,
+    shippingFee: intent.metadata.shippingFee,
   };
 
   try {
@@ -98,11 +102,11 @@ export async function POST(req: NextRequest) {
     });
 
     // ✅ Send as a single object with `products` array to Google Sheets webhook
-    if (googleSheetsOrderWebhookUrl) {
+    if (zapierWebhookUrl) {
       const payload = {
         ...orderData,
-        products: items.map((item) => ({
-          productId: Number(item.id),
+        productsOrdered: items.map((item) => ({
+          productName: item.name,
           quantity: item.quantity,
           price: item.price,
           selectedSize: item.size,
@@ -110,7 +114,7 @@ export async function POST(req: NextRequest) {
         })),
       };
 
-      const res = await fetch(googleSheetsOrderWebhookUrl, {
+      const res = await fetch(zapierWebhookUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

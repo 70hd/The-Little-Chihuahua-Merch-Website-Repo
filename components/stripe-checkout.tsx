@@ -289,8 +289,18 @@ const initialShipping = {
   state: "",
   postalCode: "",
 };
+type PriceState = {
+  subtotal: number;
+  estimatedTaxes: number;
+  estimatedOrderTotal: number;
+  shippingFee: number;
+};
+interface CheckoutPageProps {
+  amount: number;
+  price: PriceState;
+}
 
-const CheckoutPageFunc = ({ amount }: { amount: number }) => {
+const CheckoutPageFunc: React.FC<CheckoutPageProps> = ({ amount, price }) => {
   const { cartItems, clearCart } = useCart();
   const { ship, time, location } = useContext(PickupContext);
   const stripe = useStripe();
@@ -329,6 +339,7 @@ const CheckoutPageFunc = ({ amount }: { amount: number }) => {
           selectedSize: item.size,
           color: item.color,
         })),
+
       })
     );
   }, [shippingInfo]);
@@ -484,6 +495,10 @@ const CheckoutPageFunc = ({ amount }: { amount: number }) => {
           time: time,
           ship: ship,
           items: JSON.stringify(cartItems),
+          estimatedOrderTotal: price.estimatedOrderTotal,
+          estimatedTaxes: price.estimatedTaxes,
+          subtotal: price.subtotal,
+          shippingFee: price.shippingFee,
         }),
       });
       const data = await res.json();

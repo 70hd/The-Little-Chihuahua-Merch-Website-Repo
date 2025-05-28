@@ -22,6 +22,10 @@ export async function POST(request: NextRequest) {
       state,
       postalCode,
       items,
+      estimatedOrderTotal,
+      estimatedTaxes,
+      subtotal,
+      shippingFee,
     } = await request.json();
 
     if (!amount || amount <= 0) {
@@ -54,6 +58,10 @@ export async function POST(request: NextRequest) {
       time: time || "",
       ship: typeof ship === "string" ? ship : JSON.stringify(ship),
       items: JSON.stringify(cleanedItems),
+      orderTotal: estimatedOrderTotal,
+      taxes: estimatedTaxes,
+      subtotal: subtotal,
+      shippingFee: shippingFee,
     };
 
     const paymentIntent = await stripe.paymentIntents.create({

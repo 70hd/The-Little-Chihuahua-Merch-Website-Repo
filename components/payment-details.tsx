@@ -10,7 +10,7 @@ type PriceState = {
   subtotal: number;
   estimatedTaxes: number;
   estimatedOrderTotal: number;
-  shippingFee: number
+  shippingFee: number;
   setStatus: React.Dispatch<React.SetStateAction<string>>;
 };
 
@@ -19,7 +19,7 @@ const PaymentDetails = ({
   subtotal,
   estimatedTaxes,
   estimatedOrderTotal,
-  shippingFee
+  shippingFee,
 }: PriceState) => {
   const { location, time, ship, setPickupDetails } = useContext(PickupContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -27,10 +27,10 @@ const PaymentDetails = ({
 
   const pricingDetails = [
     { title: "Subtotal", amount: subtotal },
-    { title: "Estimated Taxes", amount: estimatedTaxes },
     { ...isShippingFee },
+    { title: "SF Sales Tax", amount: estimatedTaxes },
     {
-      title: "Estimated Order Total",
+      title: "Order Total",
       amount: estimatedOrderTotal,
     },
   ];
@@ -40,7 +40,7 @@ const PaymentDetails = ({
   };
 
   return (
-    <section className="relative py-6 g-black lg:w-fit sm:min-w-[285px] w-full px-6 flex flex-col gap-[30px]">
+    <section className="relative py-6 g-black lg:w-fit sm:min-w-[325px] w-full px-6 flex flex-col gap-[30px]">
       <h2>How to get it</h2>
 
       {isModalOpen && (
@@ -114,15 +114,17 @@ const PaymentDetails = ({
                 className="flex justify-between w-full text-base"
               >
                 <p>{item?.title}</p>
-                <p>${item?.amount}.00</p>
+                <p>${item?.amount?.toFixed(2)}</p>
               </div>
             )
         )}
-        <p>Additional taxes and fees will be calculated at checkout.</p>
+
       </div>
 
       <div>
-        <Button primary={true} action={() => setStatus("CHECKOUT")}>Continue to Payment</Button>
+        <Button primary={true} action={() => setStatus("CHECKOUT")}>
+          Continue to Payment
+        </Button>
       </div>
     </section>
   );

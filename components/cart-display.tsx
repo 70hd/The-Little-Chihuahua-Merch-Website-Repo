@@ -47,10 +47,13 @@ const CartDisplay: React.FC<CartDisplayProps> = ({
       subtotal += getSafePrice(item.price) * item.quantity;
     });
 
-    const taxRate = 0.08625;
-    const estimatedTaxes = Math.round(subtotal * taxRate);
-    const shippingFee = ship ? 10 : 0
-    const estimatedOrderTotal = Math.round(subtotal + shippingFee + estimatedTaxes);
+const roundToCents = (amount: number): number =>
+  Math.round(amount * 100) / 100;
+
+const taxRate = 0.08625;
+const shippingFee = ship ? 10 : 0;
+const estimatedTaxes = roundToCents((subtotal + shippingFee) * taxRate);
+const estimatedOrderTotal = roundToCents(subtotal + shippingFee + estimatedTaxes);
     setPrice({
       subtotal,
       estimatedTaxes,
