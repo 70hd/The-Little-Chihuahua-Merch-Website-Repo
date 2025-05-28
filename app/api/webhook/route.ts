@@ -111,8 +111,17 @@ export async function POST(req: NextRequest) {
       })),
     };
 
-    // await sendToZapier(zapierWebhookUrl, "Webhook 1", payload);
-    await sendToZapier(zapierOrderWebhookUrl, "Webhook 2", payload);
+try {
+  await sendToZapier(zapierWebhookUrl, "Webhook 1", payload);
+} catch (err) {
+  console.error("❌ Webhook 1 threw error:", err);
+}
+
+try {
+  await sendToZapier(zapierOrderWebhookUrl, "Webhook 2", payload);
+} catch (err) {
+  console.error("❌ Webhook 2 threw error:", err);
+}
   } catch (err: any) {
     console.error("❌ Order handling failed:", err);
     return new Response("Internal error", { status: 500 });
