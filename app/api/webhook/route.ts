@@ -6,7 +6,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-04-30.basil",
 });
 const prisma = new PrismaClient();
-
 const zapierWebhookUrl = process.env.ZAPIER_WEBHOOK_URL;
 
 async function buffer(readable: ReadableStream<Uint8Array>): Promise<Buffer> {
@@ -30,10 +29,7 @@ export async function POST(req: NextRequest) {
 
   let rawBody: Buffer;
   try {
-    if (!req.body) {
-      return new Response("Empty request body", { status: 400 });
-    }
-
+    if (!req.body) return new Response("Empty request body", { status: 400 });
     rawBody = await buffer(req.body);
   } catch {
     return new Response("Failed to read request body", { status: 400 });
@@ -42,7 +38,8 @@ export async function POST(req: NextRequest) {
   let event: Stripe.Event;
   try {
     event = stripe.webhooks.constructEvent(rawBody, signature, endpointSecret);
-  } catch {
+  } catch (err) {
+    console.error("Invalid Stripe signature:", err);
     return new Response("Invalid Stripe signature", { status: 400 });
   }
 
@@ -84,7 +81,6 @@ export async function POST(req: NextRequest) {
   };
 
   try {
-    // Save to database
     await prisma.order.create({
       data: {
         ...orderData,
@@ -93,7 +89,6 @@ export async function POST(req: NextRequest) {
             productId: item.id,
             quantity: item.quantity,
             price: item.price,
-            id: item.id,
             selectedSize: item.size,
             color: item.color,
           })),
@@ -101,12 +96,11 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // ✅ Send as a single object with `products` array to Google Sheets webhook
     if (zapierWebhookUrl) {
       const payload = {
         ...orderData,
         productsOrdered: items.map((item) => ({
-          productName: item.name,
+          productName: item.title, // fixed from item.name
           quantity: item.quantity,
           price: item.price,
           selectedSize: item.size,
@@ -119,15 +113,16 @@ export async function POST(req: NextRequest) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const text = await res.text(); // 👈 log the actual body
-      console.log("Webhook response:", res.status, text);
+
+      const responseText = await res.text();
+      console.log("Zapier response:", res.status, responseText);
 
       if (!res.ok) {
-        console.error("Google Sheets webhook failed:", res.statusText);
+        console.error("Zapier webhook failed:", res.statusText);
       }
     }
-  } catch (err) {
-    console.error("❌ Error handling order:", err);
+  } catch (err: any) {
+    console.error("❌ Error handling order:", err.message || err);
     return new Response("Internal error", { status: 500 });
   } finally {
     await prisma.$disconnect();
