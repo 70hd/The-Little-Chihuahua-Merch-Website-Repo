@@ -88,16 +88,16 @@ export async function POST(req: NextRequest) {
     });
 
     // Step 2: Create order items (with foreign key to order)
-    await prisma.orderItem.createMany({
-      data: items.map((item) => ({
-        orderId: createdOrder.id,
-        productId: item.id,
-        quantity: item.quantity,
-        price: item.price,
-        selectedSize: item.size,
-        color: item.color,
-      })),
-    });
+    // await prisma.orderItem.createMany({
+    //   data: items.map((item) => ({
+    //     orderId: createdOrder.id,
+    //     productId: item.id,
+    //     quantity: item.quantity,
+    //     price: item.price,
+    //     selectedSize: item.size,
+    //     color: item.color,
+    //   })),
+    // });
 
     // Step 3: Notify Zapier
     if (zapierWebhookUrl) {
