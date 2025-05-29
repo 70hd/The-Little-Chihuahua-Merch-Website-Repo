@@ -66,17 +66,19 @@ const Footer = () => {
         <p>www.thelittlechihuahua.com</p>
 
         <div className="flex gap-[6px] pt-2 pb-3">
-          {["/icons/facebook.svg","/icons/instagram.svg", "/icons/twitter.svg"].map((icon, i) => (
+          {[{img:"/icons/facebook.svg", link: "https://www.facebook.com/TheLittleChihuahua"},{img:"/icons/instagram.svg", link: "https://www.instagram.com/thelittlechihuahua"}, {img:"/icons/twitter.svg", link: "https://x.com/TLChihuahua"}].map((icon, i) => (
+            <a href={icon.link}>
             <Image
               key={i}
-              src={icon}
+              src={icon.img}
               width={53}
               height={53}
-              alt={`${icon
+              alt={`${icon.img
                 .split("/")
                 .pop()
                 ?.replace(".svg", "")} social media icon`}
             />
+            </a>
           ))}
         </div>
       </section>

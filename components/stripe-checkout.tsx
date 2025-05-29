@@ -233,7 +233,7 @@ const CheckoutPageFunc: React.FC<CheckoutPageProps> = ({ amount, price }) => {
     >
       {/* Contact Info */}
       <section
-        className="p-12 flex flex-col gap-6 bg-black/5"
+        className="md:p-12 p-6 flex flex-col gap-6 bg-black/5"
         aria-labelledby="contact-info"
       >
         <div className="flex items-center gap-3">
