@@ -39,7 +39,11 @@ const Footer = () => {
           <h5>The Little Chihuahua</h5>
           <p>Three San Francisco locations to serve you</p>
         </div>
-        <Button primary={true} link="https://www.thelittlechihuahua.com/" isFooter={true}>
+        <Button
+          primary={true}
+          link="https://www.thelittlechihuahua.com/"
+          isFooter={true}
+        >
           ORDER FOOD ONLINE
         </Button>
         <div className="w-full flex md:flex-row flex-col gap-[30px] items-start justify-center">
@@ -66,18 +70,27 @@ const Footer = () => {
         <p>www.thelittlechihuahua.com</p>
 
         <div className="flex gap-[6px] pt-2 pb-3">
-          {[{img:"/icons/facebook.svg", link: "https://www.facebook.com/TheLittleChihuahua"},{img:"/icons/instagram.svg", link: "https://www.instagram.com/thelittlechihuahua"}, {img:"/icons/twitter.svg", link: "https://x.com/TLChihuahua"}].map((icon, i) => (
-            <a href={icon.link}>
-            <Image
-              key={i}
-              src={icon.img}
-              width={53}
-              height={53}
-              alt={`${icon.img
-                .split("/")
-                .pop()
-                ?.replace(".svg", "")} social media icon`}
-            />
+          {[
+            {
+              img: "/icons/facebook.svg",
+              link: "https://www.facebook.com/TheLittleChihuahua",
+            },
+            {
+              img: "/icons/instagram.svg",
+              link: "https://www.instagram.com/thelittlechihuahua",
+            },
+            { img: "/icons/twitter.svg", link: "https://x.com/TLChihuahua" },
+          ].map((icon, i) => (
+            <a href={icon.link} key={i} target="_blank">
+              <Image
+                src={icon.img}
+                width={53}
+                height={53}
+                alt={`${icon.img
+                  .split("/")
+                  .pop()
+                  ?.replace(".svg", "")} social media icon`}
+              />
             </a>
           ))}
         </div>
