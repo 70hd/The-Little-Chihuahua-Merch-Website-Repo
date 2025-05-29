@@ -21,21 +21,32 @@ export async function GET() {
         where: { inventory: 0 },
         data: { status: "OUT_OF_STOCK" },
       }),
+      prisma.size.updateMany({
+        where: { inventory: { gte: 1 } },
+        data: { status: "AVAILABLE" },
+      }),
     ]);
-    const [getProducts, getPrices, getSizes, getImages, restockUsers] = await Promise.all([
-      prisma.product.findMany(),
-      prisma.prices.findMany(),
-      prisma.size.findMany(),
-      prisma.image.findMany(),
-      prisma.restockNotification.findMany(),
-    ]);
+    const [getProducts, getPrices, getSizes, getImages, restockUsers] =
+      await Promise.all([
+        prisma.product.findMany(),
+        prisma.prices.findMany(),
+        prisma.size.findMany(),
+        prisma.image.findMany(),
+        prisma.restockNotification.findMany(),
+      ]);
 
     const sortProducts = getProducts.map((product) => {
       const productId = Number(product.id);
 
-      const productPrices = getPrices.filter((p) => Number(p.productId) === productId);
-      const productSizes = getSizes.filter((s) => Number(s.productId) === productId);
-      const productImages = getImages.filter((i) => Number(i.productId) === productId);
+      const productPrices = getPrices.filter(
+        (p) => Number(p.productId) === productId
+      );
+      const productSizes = getSizes.filter(
+        (s) => Number(s.productId) === productId
+      );
+      const productImages = getImages.filter(
+        (i) => Number(i.productId) === productId
+      );
 
       return {
         id: product.id,
@@ -51,32 +62,37 @@ export async function GET() {
       };
     });
 
-
-    const productsBackInStock = getProducts.filter((product) => product.inventory >= 1);
+    const productsBackInStock = getProducts.filter(
+      (product) => product.inventory >= 1
+    );
     const notifyUsers: { productId: number; emails: string[] }[] = [];
 
-    const googleSheetsUrl = process.env.GOOGLE_SHEETS_RESTOCK_NOTIFICATION_WEBHOOK_URL;
-    if (!googleSheetsUrl) throw new Error("Google Sheets Url webhook URL is not defined");
+    const googleSheetsUrl =
+      process.env.GOOGLE_SHEETS_RESTOCK_NOTIFICATION_WEBHOOK_URL;
+    if (!googleSheetsUrl)
+      throw new Error("Google Sheets Url webhook URL is not defined");
 
     for (const product of productsBackInStock) {
-      const usersForProduct = restockUsers.filter((user) => user.productId === product.id);
+      const usersForProduct = restockUsers.filter(
+        (user) => user.productId === product.id
+      );
 
       if (usersForProduct.length > 0) {
         try {
           await Promise.all(
-  usersForProduct.map((user) => {
-    if (!user.email) return;
+            usersForProduct.map((user) => {
+              if (!user.email) return;
 
-    return fetch(googleSheetsUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: user.email,
-        productName: product.title,
-      }),
-    });
-  })
-);
+              return fetch(googleSheetsUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  email: user.email,
+                  productName: product.title,
+                }),
+              });
+            })
+          );
 
           notifyUsers.push({
             productId: product.id,
@@ -89,7 +105,10 @@ export async function GET() {
             where: { productId: product.id },
           });
         } catch (zapError) {
-          console.error(`Failed to notify users for product ${product.id}`, zapError);
+          console.error(
+            `Failed to notify users for product ${product.id}`,
+            zapError
+          );
         }
       }
     }
