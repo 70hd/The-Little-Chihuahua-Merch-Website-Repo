@@ -55,7 +55,7 @@ const currentSize = currentProduct?.sizeOptions?.find(
   width={285}
   height={285}
   sizes="(max-width: 768px) 100vw, 285px"
-  className="w-full aspect-square object-cover"
+  className="w-full aspect-square object-cover min-w-[285px]"
   onMouseEnter={() => setHover(true)}
   onMouseLeave={() => setHover(false)}
   loading="lazy"
