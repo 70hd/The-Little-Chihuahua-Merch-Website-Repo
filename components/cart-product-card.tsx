@@ -49,16 +49,17 @@ const currentSize = currentProduct?.sizeOptions?.find(
   return (
     <article className="lg:w-fit w-fit h-fit flex gap-3 md:gap-9 md:flex-row flex-col ">
       <Link href={`/product/${product.title}`}>
-      <CldImage
-        src={product?.image[dynamicImage]?.image}
-        alt={product?.image[dynamicImage]?.alt}
-        width={285}
-        height={285}
-        className="md:min-w-[285px] w-full  aspect-square object-cover"
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
-         loading="lazy"
-      />
+<CldImage
+  src={product?.image[dynamicImage]?.image}
+  alt={product?.image[dynamicImage]?.alt}
+  width={285}
+  height={285}
+  sizes="(max-width: 768px) 100vw, 285px"
+  className="w-full aspect-square object-cover"
+  onMouseEnter={() => setHover(true)}
+  onMouseLeave={() => setHover(false)}
+  loading="lazy"
+/>
       </Link>
       <div className="w-full  h-full   flex flex-col md:justify-between p-3">
         <div className="w-full h-fit  flex gap-3 justify-between items-start ">
