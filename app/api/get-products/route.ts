@@ -67,10 +67,10 @@ export async function GET() {
     );
     const notifyUsers: { productId: number; emails: string[] }[] = [];
 
-    const googleSheetsUrl =
-      process.env.GOOGLE_SHEETS_RESTOCK_NOTIFICATION_WEBHOOK_URL;
-    if (!googleSheetsUrl)
-      throw new Error("Google Sheets Url webhook URL is not defined");
+    const zapierRestockNotificationUrl =
+      process.env.ZAPIER_RESTOCK_NOTIFICATION_URL;
+    if (!zapierRestockNotificationUrl)
+      throw new Error("Zapier Url webhook URL is not defined");
 
     for (const product of productsBackInStock) {
       const usersForProduct = restockUsers.filter(
@@ -83,7 +83,7 @@ export async function GET() {
             usersForProduct.map((user) => {
               if (!user.email) return;
 
-              return fetch(googleSheetsUrl, {
+              return fetch(zapierRestockNotificationUrl, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

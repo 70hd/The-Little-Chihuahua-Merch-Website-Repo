@@ -70,7 +70,7 @@ export async function PUT(req: NextRequest) {
           },
           data: {
             inventory: {
-              decrement: item.quantity,
+              decrement: item.quantity/2,
             },
           },
         });
