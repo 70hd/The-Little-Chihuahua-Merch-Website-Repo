@@ -67,8 +67,8 @@ export async function POST(req: NextRequest) {
   const orderData = {
     orderId: intent.metadata.orderId,
     email: intent.metadata.email || intent.receipt_email || "no-email",
-    firstName: ship ? intent.metadata.firstName || null : null,
-    lastName: ship ? intent.metadata.lastName || null : null,
+    firstName: intent.metadata.firstName,
+    lastName: intent.metadata.lastName,
     amount: (intent.amount || 0) / 100,
     sessionId: intent.id,
     ship,
