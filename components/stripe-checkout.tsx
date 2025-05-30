@@ -184,7 +184,7 @@ const CheckoutPageFunc: React.FC<CheckoutPageProps> = ({ amount, price }) => {
           items: cartItems,
           estimatedOrderTotal: price.estimatedOrderTotal,
           estimatedTaxes: price.estimatedTaxes,
-          subtotal: price.subtotal,
+          subtotal: Number(price.subtotal.toFixed(2)),
           shippingFee: price.shippingFee,
         }),
       });
