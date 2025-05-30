@@ -242,6 +242,26 @@ const CheckoutPageFunc: React.FC<CheckoutPageProps> = ({ amount, price }) => {
           </div>
           <h2 id="contact-info">Contact</h2>
         </div>
+        {!ship && <div className="flex gap-6">
+          {groupedFields[0].map((field ) => (
+             <div key={field.key} className="w-full flex flex-col gap-3">
+                    <label htmlFor={field.key}>
+                      {field.name}{" "}
+                      {field.required && (
+                        <span className="text-[#CD3626]"> *</span>
+                      )}
+                    </label>
+                    <Input
+                      id={field.key}
+                      name={field.name}
+                      placeholder={field.placeholder}
+                      value={field.value}
+                      action={(e) => handleChange(field.key, e.target.value)}
+                      required={field.required}
+                    />
+                  </div>
+          ))}
+        </div>}
         <div className="flex flex-col gap-3 w-full">
           <label htmlFor="email">
             Email Address <span className="text-[#CD3626]"> *</span>
@@ -256,6 +276,7 @@ const CheckoutPageFunc: React.FC<CheckoutPageProps> = ({ amount, price }) => {
             required
           />
         </div>
+       
       </section>
 
       {/* Shipping Info */}
