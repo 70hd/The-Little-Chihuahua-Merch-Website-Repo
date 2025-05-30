@@ -13,17 +13,35 @@ const PickupLocation = () => {
   };
 
   return (
-    <div className="relative w-fit flex-wrap h-fit flex gap-6 ">
+    <div
+      className="relative w-fit flex-wrap h-fit flex gap-6"
+      aria-label="Pickup location section"
+    >
       <div className="flex flex-col">
-        <p>Pickup from {location}</p>
-        <p>{time}</p>
+        <h2 className="sr-only" id="pickup-location-heading">
+          Pickup Location Details
+        </h2>
+        <p>
+          <strong>Pickup from:</strong> {location}
+        </p>
+        <p>
+          <strong>Time:</strong> {time}
+        </p>
       </div>
-      <Button primary={false} action={toggleModal}>
+      <Button
+        primary={false}
+        action={toggleModal}
+        aria-label="Change pickup date"
+      >
         Change Pickup Date
       </Button>
 
       {modal && (
-        <div className="fixed inset-0 bg-black/0 z-0" onClick={toggleModal} />
+        <div
+          className="fixed inset-0 bg-black/0 z-0"
+          onClick={toggleModal}
+          aria-hidden="true"
+        />
       )}
       <ChangePickupTime
         modal={modal}

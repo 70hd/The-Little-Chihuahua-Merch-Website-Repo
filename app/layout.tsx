@@ -18,7 +18,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "The Little Chihuahua Merch",
-  description: "Official merch from The Little Chihuahua — wear your love for sustainable & wholesome Mexican food. 🌯 Rep SF vibes from Lower Haight, Noe Valley & Polk Street.",
+  description:
+    "Official merch from The Little Chihuahua — wear your love for sustainable & wholesome Mexican food. 🌯 Rep SF vibes from Lower Haight, Noe Valley & Polk Street.",
 };
 
 export default function RootLayout({
@@ -32,11 +33,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <CartProvider>
-        <PickupProvider>
-        <Navbar/>
-        {children}
-        <Footer/>
-        </PickupProvider>
+          <PickupProvider>
+            <Navbar />
+            {children}
+            <Footer />
+          </PickupProvider>
         </CartProvider>
       </body>
     </html>

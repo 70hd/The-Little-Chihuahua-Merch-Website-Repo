@@ -5,7 +5,10 @@ const prisma = new PrismaClient();
 
 // Utility: groups items with same productId + size
 function groupCartItems(cartItems: any[]) {
-  const map = new Map<string, { productId: number; size: string; quantity: number }>();
+  const map = new Map<
+    string,
+    { productId: number; size: string; quantity: number }
+  >();
 
   for (const item of cartItems) {
     const key = `${item.id}-${item.size}`;
@@ -28,7 +31,10 @@ export async function PUT(req: NextRequest) {
     const { cartItems } = await req.json();
 
     if (!Array.isArray(cartItems)) {
-      return NextResponse.json({ error: "Invalid cart data." }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid cart data." },
+        { status: 400 }
+      );
     }
 
     const groupedItems = groupCartItems(cartItems);
@@ -44,11 +50,15 @@ export async function PUT(req: NextRequest) {
         });
 
         if (!sizeRecord) {
-          throw new Error(`Size not found for product ${item.productId}, size ${item.size}`);
+          throw new Error(
+            `Size not found for product ${item.productId}, size ${item.size}`
+          );
         }
 
         if (sizeRecord.inventory < item.quantity) {
-          throw new Error(`Insufficient inventory for product ${item.productId}, size ${item.size}`);
+          throw new Error(
+            `Insufficient inventory for product ${item.productId}, size ${item.size}`
+          );
         }
 
         // Decrement inventory for size
@@ -58,7 +68,7 @@ export async function PUT(req: NextRequest) {
           },
           data: {
             inventory: {
-              decrement: item.quantity/2,
+              decrement: item.quantity / 2,
             },
           },
         });
@@ -70,14 +80,17 @@ export async function PUT(req: NextRequest) {
           },
           data: {
             inventory: {
-              decrement: item.quantity/2,
+              decrement: item.quantity / 2,
             },
           },
         });
       }
     });
 
-    return NextResponse.json({ message: "Inventory updated successfully." }, { status: 200 });
+    return NextResponse.json(
+      { message: "Inventory updated successfully." },
+      { status: 200 }
+    );
   } catch (error: any) {
     console.error("Inventory update error:", error);
     return NextResponse.json(

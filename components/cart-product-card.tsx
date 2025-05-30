@@ -27,12 +27,12 @@ const CartProductCard = ({
   onRemove,
   onUpdateQuantity,
 }: CartProductCardProps) => {
-const [loading, products, error] = useGetProducts();
-const currentProduct = products?.find((p) => p.id === product.id);
+  const [loading, products, error] = useGetProducts();
+  const currentProduct = products?.find((p) => p.id === product.id);
 
-const currentSize = currentProduct?.sizeOptions?.find(
-  (size) => size.size === product.size
-);
+  const currentSize = currentProduct?.sizeOptions?.find(
+    (size) => size.size === product.size
+  );
 
   const [hover, setHover] = useState(false);
   const [quantity, setQuantity] = useState(product.quantity);
@@ -49,21 +49,24 @@ const currentSize = currentProduct?.sizeOptions?.find(
   return (
     <article className="lg:w-fit w-fit h-fit flex gap-3 md:gap-9 md:flex-row flex-col ">
       <Link href={`/product/${product.title}`}>
-<CldImage
-  src={product?.image[dynamicImage]?.image}
-  alt={product?.image[dynamicImage]?.alt}
-  width={285}
-  height={285}
-  sizes="(max-width: 768px) 100vw, 285px"
-  className="w-full aspect-square object-cover min-w-[285px]"
-  onMouseEnter={() => setHover(true)}
-  onMouseLeave={() => setHover(false)}
-  loading="lazy"
-/>
+        <CldImage
+          src={product?.image[dynamicImage]?.image}
+          alt={product?.image[dynamicImage]?.alt}
+          width={285}
+          height={285}
+          sizes="(max-width: 768px) 100vw, 285px"
+          className="w-full aspect-square object-cover min-w-[285px]"
+          onMouseEnter={() => setHover(true)}
+          onMouseLeave={() => setHover(false)}
+          loading="lazy"
+        />
       </Link>
       <div className="w-full  h-full   flex flex-col md:justify-between p-3">
         <div className="w-full h-fit  flex gap-3 justify-between items-start ">
-          <Link href={`/product/${product.title}`} className="flex  w-full flex-col gap-[6px]">
+          <Link
+            href={`/product/${product.title}`}
+            className="flex  w-full flex-col gap-[6px]"
+          >
             <h2 className="w-full">{product.title}</h2>
             <p className="text-black/50">
               {product.size.toUpperCase()} |{" "}
@@ -87,7 +90,11 @@ const currentSize = currentProduct?.sizeOptions?.find(
         </div>
         <div className="w-full h-fit flex flex-col gap-[6px]">
           <h5>${product.price}</h5>
-          <Quantity number={quantity} setNumber={setQuantity} maxQuantity={currentSize?.inventory}/>
+          <Quantity
+            number={quantity}
+            setNumber={setQuantity}
+            maxQuantity={currentSize?.inventory}
+          />
         </div>
       </div>
     </article>

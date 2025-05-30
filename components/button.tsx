@@ -18,11 +18,11 @@ const Button = ({
   disabled = false,
   isFooter,
   primary,
-  type = "button"
+  type = "button",
 }: ButtonProps) => {
   const button = (
     <button
-      type={type === "submit"? "submit": "button"}
+      type={type === "submit" ? "submit" : "button"}
       onClick={action}
       disabled={disabled}
       aria-label={typeof children === `string` ? children : "Primary button"}

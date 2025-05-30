@@ -32,7 +32,7 @@ const CartDisplay: React.FC<CartDisplayProps> = ({
   checkout,
 }) => {
   const { cartItems, removeFromCart, updateQuantity } = useCart();
-    const { time,ship } = useContext(PickupContext);
+  const { ship } = useContext(PickupContext);
 
   const getSafePrice = (price: number | { price: number }): number => {
     if (typeof price === "number") return price;
@@ -47,20 +47,22 @@ const CartDisplay: React.FC<CartDisplayProps> = ({
       subtotal += getSafePrice(item.price) * item.quantity;
     });
 
-const roundToCents = (amount: number): number =>
-  Math.round(amount * 100) / 100;
+    const roundToCents = (amount: number): number =>
+      Math.round(amount * 100) / 100;
 
-const taxRate = 0.08625;
-const shippingFee = ship ? 10 : 0;
-const estimatedTaxes = roundToCents((subtotal + shippingFee) * taxRate);
-const estimatedOrderTotal = roundToCents(subtotal + shippingFee + estimatedTaxes);
+    const taxRate = 0.08625;
+    const shippingFee = ship ? 10 : 0;
+    const estimatedTaxes = roundToCents((subtotal + shippingFee) * taxRate);
+    const estimatedOrderTotal = roundToCents(
+      subtotal + shippingFee + estimatedTaxes
+    );
     setPrice({
       subtotal,
       estimatedTaxes,
       estimatedOrderTotal,
       shippingFee,
     });
-  }, [cartItems, setPrice,ship]);
+  }, [cartItems, setPrice, ship]);
   return (
     <div className="h-fit w-full lg:w-fit flex flex-col gap-9">
       <header className="w-full bg-white py-3 flex justify-between sticky z-50 border-b border-black/25 top-0">
@@ -89,7 +91,6 @@ const estimatedOrderTotal = roundToCents(subtotal + shippingFee + estimatedTaxes
         aria-label="Cart items"
       >
         {cartItems.map((item: CartItem, index: number) => {
-         
           return (
             <CartProductCard
               key={index}

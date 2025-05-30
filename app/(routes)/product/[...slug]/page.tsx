@@ -58,7 +58,6 @@ const ProductPage = () => {
   const [restockLoading, setRestockLoading] = useState(false);
   const [maxQuantity, setMaxQuantity] = useState(100);
 
-
   useEffect(() => {
     if (size.size !== "Select Size") {
       const option = product?.sizeOptions.find((opt) => opt.size === size.size);

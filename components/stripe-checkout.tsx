@@ -182,10 +182,10 @@ const CheckoutPageFunc: React.FC<CheckoutPageProps> = ({ amount, price }) => {
           time: time,
           ship: ship,
           items: cartItems,
-          estimatedOrderTotal: price.estimatedOrderTotal,
-          estimatedTaxes: price.estimatedTaxes,
+          estimatedOrderTotal: Number(price.estimatedOrderTotal.toFixed(2)),
+          estimatedTaxes: Number(price.estimatedTaxes.toFixed(2)),
           subtotal: Number(price.subtotal.toFixed(2)),
-          shippingFee: price.shippingFee,
+          shippingFee: Number(price.shippingFee.toFixed(2)),
         }),
       });
       const data = await res.json();
@@ -343,7 +343,7 @@ const CheckoutPageFunc: React.FC<CheckoutPageProps> = ({ amount, price }) => {
 
       <div>
         <Button primary type="submit" disabled={loading}>
-          {loading ? "Processing..." : `Pay $${amount}`}
+          {loading ? "Processing..." : `Pay $${amount.toFixed(2)}`}
         </Button>
       </div>
     </form>

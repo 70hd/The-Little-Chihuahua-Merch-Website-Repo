@@ -42,7 +42,11 @@ export async function POST(req: NextRequest) {
 
   let event: Stripe.Event;
   try {
-    event = stripe.webhooks.constructEvent(rawBody, signature, stripeWebhookSecret);
+    event = stripe.webhooks.constructEvent(
+      rawBody,
+      signature,
+      stripeWebhookSecret
+    );
   } catch (err) {
     console.error("❌ Invalid Stripe signature:", err);
     return new Response("Invalid signature", { status: 400 });
@@ -126,13 +130,16 @@ export async function POST(req: NextRequest) {
   return new Response("✅ Order processed", { status: 200 });
 }
 
-async function sendToZapier(url: string | undefined, label: string, payload: object) {
+async function sendToZapier(
+  url: string | undefined,
+  label: string,
+  payload: object
+) {
   if (!url) {
     console.warn(`⚠️ ${label} skipped — no URL defined.`);
     return;
   }
 
-  console.log(`📡 Sending to ${label}: ${url}`);
   try {
     const res = await fetch(url, {
       method: "POST",
@@ -141,7 +148,6 @@ async function sendToZapier(url: string | undefined, label: string, payload: obj
     });
 
     const text = await res.text();
-    console.log(`🔔 ${label} response [${res.status}]: ${text}`);
 
     if (!res.ok) {
       console.error(`❌ ${label} failed with status:`, res.statusText);

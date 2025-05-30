@@ -36,8 +36,7 @@ export default function CheckoutPage({ amount, price }: CheckoutPageProps) {
   }, []);
 
   return (
-    <main >
-
+    <main>
       {loading || !stripe ? (
         <div className="flex justify-center items-center min-h-[200px]">
           <span className="animate-spin rounded-full border-4 border-t-transparent h-12 w-12 border-black"></span>
@@ -51,7 +50,7 @@ export default function CheckoutPage({ amount, price }: CheckoutPageProps) {
             currency: "usd",
           }}
         >
-          <CheckoutPageFunc amount={amount} price={price}  />
+          <CheckoutPageFunc amount={amount} price={price} />
         </Elements>
       )}
     </main>

@@ -33,17 +33,16 @@ export async function POST(request: NextRequest) {
       throw new Error("Invalid or missing amount");
     }
 
-
-    const cleanedItems = (Array.isArray(items) ? items : JSON.parse(items || "[]")).map(
-  (item: any) => ({
-    id: item.id,
-    title: item.title,
-    price: item.price,
-    quantity: item.quantity ?? 1,
-    size: item.size,
-    color: item.color,
-  })
-);
+    const cleanedItems = (
+      Array.isArray(items) ? items : JSON.parse(items || "[]")
+    ).map((item: any) => ({
+      id: item.id,
+      title: item.title,
+      price: item.price,
+      quantity: item.quantity ?? 1,
+      size: item.size,
+      color: item.color,
+    }));
 
     const metadata = {
       email: email || "",
@@ -63,7 +62,7 @@ export async function POST(request: NextRequest) {
       taxes: estimatedTaxes,
       subtotal: subtotal,
       shippingFee: shippingFee,
-      orderId: orderId
+      orderId: orderId,
     };
 
     const paymentIntent = await stripe.paymentIntents.create({
@@ -81,7 +80,10 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error("❌ Internal Error:", error.message || error);
     return NextResponse.json(
-      { error: "Internal Server Error", message: error.message || "Unknown error" },
+      {
+        error: "Internal Server Error",
+        message: error.message || "Unknown error",
+      },
       { status: 500 }
     );
   }

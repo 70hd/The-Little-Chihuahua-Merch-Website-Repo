@@ -20,11 +20,27 @@ export default function PaymentSuccessPage() {
       .catch(() => setStatus("error"));
   }, [paymentIntentId]);
 
-  if (status === "checking") return <p className="dynamic-24-y-padding dynamic-x-padding">Checking payment status...</p>;
-  if (status === "failed" || status === "error")
-    return <p className="dynamic-24-y-padding dynamic-x-padding">Payment was not successful. Please try again.</p>;
+  if (status === "checking")
+    return (
+      <div
+        role="status"
+        aria-live="polite"
+        className="dynamic-24-y-padding dynamic-x-padding"
+      >
+        Checking payment status...
+      </div>
+    );
 
-  return (
-      <PaymentSuccess />
-  );
+  if (status === "failed" || status === "error")
+    return (
+      <div
+        role="alert"
+        aria-live="assertive"
+        className="dynamic-24-y-padding dynamic-x-padding text-red-600"
+      >
+        Payment was not successful. Please try again.
+      </div>
+    );
+
+  return <PaymentSuccess />;
 }

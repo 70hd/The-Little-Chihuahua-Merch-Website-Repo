@@ -9,7 +9,10 @@ export async function GET(request: NextRequest) {
   const paymentIntentId = request.nextUrl.searchParams.get("payment_intent");
 
   if (!paymentIntentId) {
-    return NextResponse.json({ error: "Missing payment_intent" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Missing payment_intent" },
+      { status: 400 }
+    );
   }
 
   try {
@@ -17,6 +20,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ status: paymentIntent.status });
   } catch (error) {
     console.error("Failed to verify payment:", error);
-    return NextResponse.json({ error: "Failed to verify payment" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to verify payment" },
+      { status: 500 }
+    );
   }
 }

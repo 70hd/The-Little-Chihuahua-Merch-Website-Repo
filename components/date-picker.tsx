@@ -26,7 +26,7 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
       }
     };
 
-    updateWidth(); 
+    updateWidth();
     window.addEventListener("resize", updateWidth);
 
     return () => window.removeEventListener("resize", updateWidth);

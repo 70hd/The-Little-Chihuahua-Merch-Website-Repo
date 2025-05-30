@@ -45,9 +45,14 @@ export async function POST(req: Request) {
     const zapRes = await fetch(zapierContactUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, phoneNumber, selectLocation, comments }),
+      body: JSON.stringify({
+        name,
+        email,
+        phoneNumber,
+        selectLocation,
+        comments,
+      }),
     });
-
 
     if (!zapRes.ok) {
       console.error("Zapier request failed:", zapRes.status);

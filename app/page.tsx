@@ -10,7 +10,6 @@ interface PriceOption {
   price: number;
 }
 
-// /types.ts
 export interface SizeOption {
   id: number;
   productId: number;
@@ -34,23 +33,23 @@ export default function Home() {
   const [finalProducts, setFinalProducts] = useState<ProductType[]>([]);
   const [loading, products, error] = useGetProducts();
 
-useEffect(() => {
-  if (Array.isArray(products)) {
-    const normalized = products.map((p) => ({
-      ...p,
-      sizeOptions: p.sizeOptions.map((so) => ({
-        id: so.id ?? 0,                  // provide default or actual value
-        productId: p.id,                 // assign parent productId
-        size: so.size,
-        inventory: so.inventory ?? 0,    // default inventory if missing
-        status: so.status ?? "unknown", // default status if missing
-      })),
-    }));
-    setFinalProducts(normalized);
-  } else {
-    setFinalProducts([]);
-  }
-}, [loading, products, error]);
+  useEffect(() => {
+    if (Array.isArray(products)) {
+      const normalized = products.map((p) => ({
+        ...p,
+        sizeOptions: p.sizeOptions.map((so) => ({
+          id: so.id ?? 0, 
+          productId: p.id, 
+          size: so.size,
+          inventory: so.inventory ?? 0, 
+          status: so.status ?? "unknown", 
+        })),
+      }));
+      setFinalProducts(normalized);
+    } else {
+      setFinalProducts([]);
+    }
+  }, [loading, products, error]);
 
   return (
     <main className="flex flex-col gap-[30px] overflow-hidden">
@@ -87,36 +86,34 @@ useEffect(() => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 py-6">
-          {loading ? (
-            Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="w-full h-[392px] loader" />
-            ))
-          ) : Array.isArray(finalProducts) && finalProducts.length > 0 ? (
-            finalProducts.map((product: ProductType) => (
-              <Product
-                key={product.id}
-                status={product.status}
-                price={formatPrice(product)}
-                title={product.title}
-                image={
-                  product.images?.map((img) => ({
-                    id: img.id,
-                    productId: product.id,
-                    image: img.image,
-                    alt: img.alt,
-                  })) ?? []
-                }
-                alt="custom alt"
-                size={product.sizeOptions.map((opt) => opt.size)}
-                fullSize={product.sizeOptions}
-                loading={loading}
-              />
-            ))
-          ) : (
-          Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="w-full h-[392px] loader" />
-            ))
-          )}
+          {loading
+            ? Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="w-full h-[392px] loader" />
+              ))
+            : Array.isArray(finalProducts) && finalProducts.length > 0
+            ? finalProducts.map((product: ProductType) => (
+                <Product
+                  key={product.id}
+                  status={product.status}
+                  price={formatPrice(product)}
+                  title={product.title}
+                  image={
+                    product.images?.map((img) => ({
+                      id: img.id,
+                      productId: product.id,
+                      image: img.image,
+                      alt: img.alt,
+                    })) ?? []
+                  }
+                  alt="custom alt"
+                  size={product.sizeOptions.map((opt) => opt.size)}
+                  fullSize={product.sizeOptions}
+                  loading={loading}
+                />
+              ))
+            : Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="w-full h-[392px] loader" />
+              ))}
         </div>
       </section>
     </main>

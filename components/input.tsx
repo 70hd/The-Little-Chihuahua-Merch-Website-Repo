@@ -5,14 +5,22 @@ type InputProps = {
   placeholder: string;
   action: (e: React.ChangeEvent<HTMLInputElement>) => void;
   type?: string;
-  required?: boolean
+  required?: boolean;
 };
 
-const Input = ({ id,type, name, value, placeholder, action,required }: InputProps) => {
+const Input = ({
+  id,
+  type,
+  name,
+  value,
+  placeholder,
+  action,
+  required,
+}: InputProps) => {
   return (
     <input
       id={String(id)}
-      type={type === "email" ? "email": "text"}
+      type={type === "email" ? "email" : "text"}
       name={name}
       value={value}
       onChange={action}

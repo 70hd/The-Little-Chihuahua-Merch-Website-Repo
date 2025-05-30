@@ -23,16 +23,12 @@ const PaymentDetails = ({
 }: PriceState) => {
   const { location, time, ship, setPickupDetails } = useContext(PickupContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const isShippingFee = ship && { title: "Shipping Fee", amount: shippingFee };
 
   const pricingDetails = [
     { title: "Subtotal", amount: subtotal },
-    { ...isShippingFee },
+    ...(ship ? [{ title: "Shipping Fee", amount: shippingFee }] : []),
     { title: "SF Sales Tax", amount: estimatedTaxes },
-    {
-      title: "Order Total",
-      amount: estimatedOrderTotal,
-    },
+    { title: "Order Total", amount: estimatedOrderTotal },
   ];
 
   const handleToggleModal = () => {
@@ -51,10 +47,10 @@ const PaymentDetails = ({
         />
       )}
 
-      <div className={`flex flex-col gap-3`}>
+      <div className="flex flex-col gap-3">
         <div
-          className={`flex flex-col relative gap-3 w-full max-w-[285px]  ${
-            ship ? "opacity-40 cursor-not-allowed " : ""
+          className={`flex flex-col relative gap-3 w-full max-w-[285px] ${
+            ship ? "opacity-40 cursor-not-allowed" : ""
           }`}
         >
           <ChangePickupTimeModal
@@ -67,39 +63,34 @@ const PaymentDetails = ({
             <button
               key={index}
               type="button"
-              onClick={() => handleToggleModal()}
+              onClick={handleToggleModal}
               disabled={ship}
-              className={` ${
-                ship ? "cursor-not-allowed" : ""
-              } flex items-center w-full  gap-2 cursor-pointer focus:outline-none focus:ring `}
+              className={`flex items-center w-full gap-2 ${
+                ship ? "cursor-not-allowed opacity-80" : ""
+              } focus:outline-none focus:ring`}
               aria-label={`Change pickup ${item}`}
             >
               <Image
                 src="/icons/pin.svg"
                 width={20}
                 height={20}
-                aria-label={`Pickup ${item} Icon`}
-                alt="Pickup location icon"
-                className={`${ship ? "opacity-80 cursor-not-allowed" : ""}`}
+                alt={`Pickup ${item} icon`}
+                className={ship ? "opacity-80" : ""}
               />
-              <span
-                className={`${
-                  ship ? "opacity-80 cursor-not-allowed line-through" : ""
-                }`}
-              >
+              <span className={ship ? "line-through opacity-80" : ""}>
                 {item === "location" ? location : time}
               </span>
             </button>
           ))}
         </div>
-        <div className="flex gap-[6px] items-center ">
+
+        <div className="flex gap-[6px] items-center">
           <input
             type="checkbox"
             checked={ship}
             onChange={() => setPickupDetails(location, time, !ship)}
-            className={`appearance-none w-[17px] h-[17px] border bg-black/5 border-[#D1D5DB] rounded-none
-            checked:bg-[#3875CB]
-`}
+            className="appearance-none w-[17px] h-[17px] border bg-black/5 border-[#D1D5DB] rounded-none checked:bg-[#3875CB]"
+            aria-label="Toggle shipping option"
           />
           <p>Ship it to me</p>
         </div>
@@ -113,12 +104,11 @@ const PaymentDetails = ({
                 key={index}
                 className="flex justify-between w-full text-base"
               >
-                <p>{item?.title}</p>
-                <p>${item?.amount?.toFixed(2)}</p>
+                <p>{item.title}</p>
+                <p>${item.amount.toFixed(2)}</p>
               </div>
             )
         )}
-
       </div>
 
       <div>
