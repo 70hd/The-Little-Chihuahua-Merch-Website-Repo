@@ -64,7 +64,8 @@ const Checkout: React.FC = () => {
                   "<span className="text-[#CD3626]">*</span>" indicates required fields
                 </p>
       </header>
-        <CheckoutPage amount={price.estimatedOrderTotal + price.shippingFee} price={price}/>
+        {/* <CheckoutPage amount={price.estimatedOrderTotal + price.shippingFee} price={price}/> */}
+                <CheckoutPage amount={1} price={price}/>
         </main>
       )
       }

@@ -113,7 +113,9 @@ useEffect(() => {
               />
             ))
           ) : (
-            <p>No products available.</p>
+          Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="w-full h-[392px] loader" />
+            ))
           )}
         </div>
       </section>
