@@ -45,7 +45,7 @@ const Dropdown = ({
   };
   if (!Array.isArray(products)) return null;
   return (
-    <div className="w-fit h-fit  z-10 relative items-start min-w-[225px] flex  lg:justify-end">
+    <div className="w-fit h-fit  z-10 relative items-start min-w-[225px] flex justify-start">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="cursor-pointer flex gap-3 items-center w-fit"

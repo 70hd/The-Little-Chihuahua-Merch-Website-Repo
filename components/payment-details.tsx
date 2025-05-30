@@ -46,7 +46,10 @@ const PaymentDetails = ({
           aria-hidden="true"
         />
       )}
-
+      <div className="w-fit h-fit flex flex-col gap-3">
+        <h5>
+          Pickup
+        </h5>
       <div className="flex flex-col gap-3">
         <div
           className={`flex flex-col relative gap-3 w-full max-w-[285px] ${
@@ -82,7 +85,10 @@ const PaymentDetails = ({
               </span>
             </button>
           ))}
-        </div>
+        </div> 
+        <h5>
+          Get it Delivered
+        </h5>
 
         <div className="flex gap-[6px] items-center">
           <input
@@ -94,6 +100,7 @@ const PaymentDetails = ({
           />
           <p>Ship it to me</p>
         </div>
+      </div>
       </div>
 
       <div className="flex w-full flex-col gap-3">

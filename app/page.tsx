@@ -70,8 +70,8 @@ export default function Home() {
         className="flex flex-col gap-[30px]  md:py-12 dynamic-x-padding w-full"
         aria-label="Product and location section"
       >
-        <div className="flex flex-wrap gap-6 w-full h-fit justify-between items-center">
-          <PickupLocation />
+        <div className="flex flex-wrap gap-6 w-full h-fit items-start justify-start">
+          {/* <PickupLocation /> */}
           <Dropdown
             setProducts={setFinalProducts}
             products={
