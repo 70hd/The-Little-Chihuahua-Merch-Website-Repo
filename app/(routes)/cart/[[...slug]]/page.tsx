@@ -27,8 +27,8 @@ const Checkout: React.FC = () => {
   const { cartItems } = useCart();
   useEffect(() => {
     if (
-      pathname?.includes("/checkout/") &&
-      pathname.split("/checkout/")[1]?.includes("success")
+      pathname?.includes("/cart/") &&
+      pathname.split("/cart/")[1]?.includes("success")
     ) {
       setStatus("SUCCESS");
     } else {

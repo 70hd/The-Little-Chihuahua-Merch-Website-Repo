@@ -115,8 +115,8 @@ const CartDisplay: React.FC<CartDisplayProps> = ({
 
       {button && (
         <div className="sticky bottom-0 w-full h-fit p-3 bg-white border-t border-black/25 flex justify-between">
-          <Button link="/checkout" primary={true}>
-            Checkout
+          <Button link="/cart" primary={true}>
+            Cart
           </Button>
         </div>
       )}

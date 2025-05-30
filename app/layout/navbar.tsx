@@ -23,8 +23,8 @@ const Navbar = () => {
             <h3 className="text-[#CD3626]">Contact</h3>
           </Link>
 
-          <Button primary={true} link="/checkout">
-            CHECKOUT
+          <Button primary={true} link="/cart">
+            CART
           </Button>
         </div>
       </div>
