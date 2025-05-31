@@ -39,6 +39,7 @@ const CartDisplay: React.FC<CartDisplayProps> = ({
     if (typeof price === "object" && "price" in price) return price.price;
     return 0;
   };
+
   useEffect(() => {
     if (!setPrice) return;
 
@@ -63,6 +64,7 @@ const CartDisplay: React.FC<CartDisplayProps> = ({
       shippingFee,
     });
   }, [cartItems, setPrice, ship]);
+
   return (
     <div className="h-fit w-full lg:w-fit flex flex-col gap-9">
       <header className="w-full bg-white py-3 flex justify-between sticky z-50 border-b border-black/25 top-0">
@@ -84,12 +86,7 @@ const CartDisplay: React.FC<CartDisplayProps> = ({
         </div>
       </header>
 
-      <section
-        className={`flex flex-col gap-9 ${
-          checkout ? "lg:h-fit h-full max-h-[606px] overflow-y-auto" : ""
-        }`}
-        aria-label="Cart items"
-      >
+      <div className="flex flex-col gap-9 flex-grow max-h-[606px] overflow-y-auto" aria-label="Cart items">
         {cartItems.map((item: CartItem, index: number) => {
           return (
             <CartProductCard
@@ -111,10 +108,10 @@ const CartDisplay: React.FC<CartDisplayProps> = ({
             />
           );
         })}
-      </section>
+      </div>
 
       {button && (
-        <div className="sticky bottom-0 w-full h-fit p-3 bg-white border-t border-black/25 flex justify-between">
+        <div className="sticky bottom-0 w-full h-fit p-3 bg-white border-t border-black/25 flex justify-between z-40">
           <Button link="/cart" primary={true}>
             Cart
           </Button>
