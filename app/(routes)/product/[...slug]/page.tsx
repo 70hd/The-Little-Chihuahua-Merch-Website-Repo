@@ -387,7 +387,13 @@ const ProductPage = () => {
                   }
                   alt="custom alt"
                   size={product.sizeOptions.map((opt) => opt.size)}
-                  fullSize={product.sizeOptions}
+                  fullSize={product.sizeOptions.map((opt, i) => ({
+                    size: opt.size,
+                    productId: product.id,
+                    id: opt.id ?? i,
+                    inventory: opt.inventory ?? 0,
+                    status: opt.status ?? "UNKNOWN"
+                  }))}
                   loading={loading}
                 />
               ))
