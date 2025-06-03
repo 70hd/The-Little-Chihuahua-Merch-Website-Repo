@@ -47,7 +47,7 @@ const CartProductCard = ({
     return <div className="min-w-[285px] w-full h-[392px] full loader" />;
   }
   return (
-    <article className="lg:w-fit w-fit h-fit flex gap-3 md:gap-9 md:flex-row flex-col ">
+<article className="lg:w-fit w-fit h-[285px] flex gap-3 md:gap-9 md:flex-row flex-col">
       <Link href={`/product/${product.title}`}>
         <CldImage
           src={product?.image[dynamicImage]?.image}
@@ -61,7 +61,7 @@ const CartProductCard = ({
           loading="lazy"
         />
       </Link>
-      <div className="w-full  h-full   flex flex-col md:justify-between p-3">
+      <div className="w-full  h-full  flex flex-col justify-between p-3">
         <div className="w-full h-fit  flex gap-3 justify-between items-start ">
           <Link
             href={`/product/${product.title}`}
