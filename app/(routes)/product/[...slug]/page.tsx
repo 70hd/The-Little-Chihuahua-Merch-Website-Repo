@@ -11,6 +11,7 @@ import { useCart } from "@/context/cart-context";
 import Cart from "@/app/modals/cart";
 import Input from "@/components/input";
 import NotFound from "@/app/not-found";
+import Product from "@/components/product";
 
 interface PriceOption {
   price: number;
@@ -57,6 +58,8 @@ const ProductPage = () => {
   const [errors, setErrors] = useState<Errors>({ email: "", size: "" });
   const [restockLoading, setRestockLoading] = useState(false);
   const [maxQuantity, setMaxQuantity] = useState(100);
+  
+  const [recommended, setRecommended] = useState<Product[]>([]);
 
   useEffect(() => {
     if (size.size !== "Select Size") {
@@ -128,6 +131,12 @@ const ProductPage = () => {
         colorHex: filteredProduct.colorHex,
       });
       setPrice(filteredProduct.priceOptions[0]);
+
+      const filteredRecommendations = products
+        ?.filter((p) => p.title !== filteredProduct.title)
+        ?.sort(() => Math.random() - 0.5)
+        .slice(0, 3) ?? [];
+      setRecommended(filteredRecommendations);
     }
   }, [products, url]);
 
@@ -184,7 +193,8 @@ const ProductPage = () => {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row px-4 md:px-16 lg:px-36 xl:px-60 gap-8 py-12  items-center">
+    <div className="flex flex-col gap-9 dynamic-x-padding dynamic-24-y-padding">
+    <div className="flex flex-col lg:flex-row gap-8 items-center">
       <ProductImages
         imageOptions={
           product?.images?.map((img, index) => ({
@@ -346,7 +356,7 @@ const ProductPage = () => {
               </div>
             )}
       </div>
-
+       
       {modal && (
         <div
           className="fixed top-0 left-0 w-full h-screen z-40 bg-black/25"
@@ -355,6 +365,38 @@ const ProductPage = () => {
       )}
       <Cart canScroll={false} modal={modal} setModal={setModal} value={1} />
     </div>
+    <div className="py-6 flex flex-col gap-6">
+      <h2>
+        Featured Products
+      </h2>
+     <div className="flex gap-6 md:flex-row flex-col">
+          {!loading && recommended.length > 0
+            ? recommended.map((product: Product) => (
+                <Product
+                  key={product.id}
+                  status={product.status}
+                  price={formatPrice(product)}
+                  title={product.title}
+                  image={
+                    product.images?.map((img) => ({
+                      id: img.id,
+                      productId: product.id,
+                      image: img.image,
+                      alt: img.alt,
+                    })) ?? []
+                  }
+                  alt="custom alt"
+                  size={product.sizeOptions.map((opt) => opt.size)}
+                  fullSize={product.sizeOptions}
+                  loading={loading}
+                />
+              ))
+            : Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="w-full h-[392px] loader" />
+              ))}
+        </div>
+        </div>
+        </div>
   );
 };
 
