@@ -16,6 +16,7 @@ type PriceState = {
 };
 
 const Checkout: React.FC = () => {
+   
   const [status, setStatus] = useState("PREVIEW");
   const [price, setPrice] = useState<PriceState>({
     subtotal: 0,
@@ -53,6 +54,7 @@ const Checkout: React.FC = () => {
             subtotal={price.subtotal}
             shippingFee={price.shippingFee}
             setStatus={setStatus}
+            setPrice={setPrice}
           />{" "}
         </div>
       ) : (
