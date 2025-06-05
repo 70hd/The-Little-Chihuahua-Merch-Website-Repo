@@ -5,6 +5,7 @@ import Navbar from "./layout/navbar";
 import Footer from "./layout/footer";
 import { PickupProvider } from "@/context/pickup-context";
 import { CartProvider } from "@/context/cart-context";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
