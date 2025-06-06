@@ -6,6 +6,7 @@ import Footer from "./layout/footer";
 import { PickupProvider } from "@/context/pickup-context";
 import { CartProvider } from "@/context/cart-context";
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Analytics } from "@vercel/analytics/react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,6 +41,8 @@ export default function RootLayout({
             <Footer />
           </PickupProvider>
         </CartProvider>
+         <SpeedInsights />
+         <Analytics/>
       </body>
     </html>
   );
