@@ -79,7 +79,7 @@ const Checkout: React.FC = () => {
             </p>
           </header>
           <CheckoutPage
-            amount={price.estimatedOrderTotal + price.shippingFee}
+            amount={price.estimatedOrderTotal}
             price={price}
           />
         </main>
